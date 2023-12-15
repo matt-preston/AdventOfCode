@@ -11,6 +11,8 @@ import static aoc.y2023.Day13Test.Direction.HORIZONTAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
+import static utils.Utils.matrix;
+import static utils.Utils.rotateCW;
 
 @AdventOfCode(year = 2023, day = 13)
 public class Day13Test {
@@ -137,7 +139,7 @@ public class Day13Test {
       return new Symmetry(HORIZONTAL, rows);
     }
 
-    final var columns = findHorizontalSymmetry(rotate(matrix), previousMatch.columnIndex());
+    final var columns = findHorizontalSymmetry(rotateCW(matrix), previousMatch.columnIndex());
     if (columns > -1) {
       return new Symmetry(Direction.VERTICAL, columns);
     }
@@ -163,26 +165,5 @@ public class Day13Test {
       }
     }
     return -1;
-  }
-
-  private char[][] matrix(String notes) {
-    final var split = notes.split("\n");
-
-    var result = new char[split.length][split[0].length()];
-    for (int i = 0; i < split.length; i++) {
-      result[i] = split[i].toCharArray();
-    }
-
-    return result;
-  }
-
-  private char[][] rotate(char[][] matrix) {
-    var result = new char[matrix[0].length][matrix.length];
-    for (int x = 0; x < matrix.length; x++) {
-      for (int y = 0; y < matrix[0].length; y++) {
-        result[y][result[0].length - x - 1] = matrix[x][y];
-      }
-    }
-    return result;
   }
 }

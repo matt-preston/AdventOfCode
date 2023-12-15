@@ -1,21 +1,24 @@
 package aoc.y2023;
 
-import java.util.Arrays;
-
 import org.junit.jupiter.api.Test;
 
 import utils.AdventOfCode;
 import utils.Input;
+import utils.Utils;
 
 import static java.lang.Math.max;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
+import static utils.Utils.matrix;
+import static utils.Utils.rotateCW;
 
 @AdventOfCode(year = 2023, day = 14)
 public class Day14Test {
 
-  record Cycle(int offset, int length) {}
+  record Cycle(int offset, int length) {
+
+  }
 
   public static final String MOCK = """
       O....#....
@@ -71,7 +74,7 @@ public class Day14Test {
   }
 
   private int part1Score(Input input) {
-    return score(rollNorth(parse(input.linesArray())));
+    return score(rollNorth(matrix(input.text())));
   }
 
   private int countBetween(final char[] line, final char target, final int nearestRock, final int offset) {
@@ -120,13 +123,13 @@ public class Day14Test {
         tortoise++;
         hare += 2;
       }
-    } while(length < minLength);
+    } while (length < minLength);
 
     return new Cycle(tortoise, length);
   }
 
   private int[] scoreCycle(Input input, int cycles) {
-    char[][] matrix = parse(input.linesArray());
+    char[][] matrix = matrix(input.text());
     int[] scores = new int[cycles];
 
     for (int cycle = 0; cycle < cycles; cycle++) {
@@ -154,24 +157,21 @@ public class Day14Test {
     return rotateCW(rollWest(temp));
   }
 
-  private char[][] rollWest(final char[][] matrix2) {
-    final var copyOfMatrix = new char[matrix2.length][matrix2[0].length];
-    for (int i = 0; i < matrix2.length; i++) {
-      copyOfMatrix[i] = Arrays.copyOf(matrix2[i], matrix2[i].length);
-    }
+  private char[][] rollWest(final char[][] matrix) {
+    final var result = Utils.copy(matrix);
 
-    for (int x = 0; x < copyOfMatrix.length; x++) {
-      for (int y = 0; y < copyOfMatrix[x].length; y++) {
-        if (copyOfMatrix[x][y] == 'O') {
-          var nearestRock = closestRock(copyOfMatrix[x], y);
-          var between = countBetween(copyOfMatrix[x], 'O', nearestRock, y);
+    for (int x = 0; x < result.length; x++) {
+      for (int y = 0; y < result[x].length; y++) {
+        if (result[x][y] == 'O') {
+          var nearestRock = closestRock(result[x], y);
+          var between = countBetween(result[x], 'O', nearestRock, y);
 
-          copyOfMatrix[x][y] = '.';
-          copyOfMatrix[x][nearestRock + 1 + between] = 'O';
+          result[x][y] = '.';
+          result[x][nearestRock + 1 + between] = 'O';
         }
       }
     }
-    return copyOfMatrix;
+    return result;
   }
 
   private char[][] rollSouth(final char[][] matrix) {
@@ -182,25 +182,5 @@ public class Day14Test {
   private char[][] rollEast(final char[][] matrix) {
     var temp = rotateCW(rotateCW(matrix));
     return rotateCW(rotateCW(rollWest(temp)));
-  }
-
-  public char[][] parse(String[] input) {
-    char[][] result = new char[input.length][input[0].length()];
-
-    for (int x = 0; x < input.length; x++) {
-      result[x] = input[x].toCharArray();
-    }
-
-    return result;
-  }
-
-  private char[][] rotateCW(char[][] matrix) {
-    var result = new char[matrix[0].length][matrix.length];
-    for (int x = 0; x < matrix.length; x++) {
-      for (int y = 0; y < matrix[0].length; y++) {
-        result[y][result[0].length - x - 1] = matrix[x][y];
-      }
-    }
-    return result;
   }
 }

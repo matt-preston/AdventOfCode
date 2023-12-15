@@ -92,10 +92,6 @@ public class Day11Test {
   private long sumOfShortestPaths(final Input input, int weightOfEmpty) {
     final var pointMap = plotGalaxies(input.lines(), weightOfEmpty);
 
-    for (final Map.Entry<Integer, Point> entry : pointMap.entrySet()) {
-      System.out.println(entry);
-    }
-
     // Find all {point, point} combinations
     final var pairs = Sets.combinations(IntStream.range(1, pointMap.size() + 1)
         .boxed()
