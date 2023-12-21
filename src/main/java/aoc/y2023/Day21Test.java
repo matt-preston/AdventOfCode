@@ -15,6 +15,7 @@ import utils.Utils;
 import utils.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static utils.Utils.predictNthInQuadratic;
 
 @AdventOfCode(year = 2023, day = 21)
 public class Day21Test {
@@ -104,17 +105,12 @@ public class Day21Test {
   @Test
   public void part2() {
     final var input = Input.input(this);
-
-    assertEquals(620348631910321L, predictNth(
+    assertEquals(620348631910321L, predictNthInQuadratic(
         (26501365 - 65) / 131,
         numNodesVisited(input, 65, true),
         numNodesVisited(input, 65 + 131, true),
         numNodesVisited(input, 65 + (2 * 131), true)
     ));
-  }
-
-  private long predictNth(long n, long a, long b, long c) {
-    return a + n * (b - a + (n - 1) * (c - b - b + a) / 2);
   }
 
   private int numNodesVisited(Input input, int steps, boolean withWrap) {
@@ -124,12 +120,9 @@ public class Day21Test {
         .findAny()
         .orElseThrow();
 
-    record GridNode(Vector position, Node node) {
-
-    }
+    record GridNode(Vector position, Node node) { }
 
     var visited = Sets.<GridNode>newHashSet();
-
     var frontier = Sets.<GridNode>newHashSet();
     frontier.add(new GridNode(new Vector(0, 0), start));
 

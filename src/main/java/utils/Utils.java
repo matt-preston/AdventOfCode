@@ -39,4 +39,8 @@ public class Utils {
     }
     return result;
   }
+
+  public static long predictNthInQuadratic(long n, long first, long second, long third) {
+    return first + n * (second - first + (n - 1) * (third - second - second + first) / 2);
+  }
 }
