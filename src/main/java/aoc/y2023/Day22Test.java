@@ -1,21 +1,25 @@
 package aoc.y2023;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.function.Function;
-import java.util.stream.IntStream;
-
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.ImmutableSortedSet;
-
-import org.checkerframework.common.value.qual.IntRange;
+import com.google.common.collect.*;
 import org.junit.jupiter.api.Test;
-
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineSegment;
+import utils.AdventOfCode;
 import utils.Input;
 import utils.Utils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.IntBinaryOperator;
+
+import static java.lang.Math.max;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static utils.Input.input;
+import static utils.Input.mockInput;
+
+@AdventOfCode(year = 2023, day = 22)
 public class Day22Test {
 
   record Vector3(int x, int y, int z) {
@@ -24,71 +28,198 @@ public class Day22Test {
     public String toString() {
       return "(" + x + "," + y + "," + z + ")";
     }
+
+    public Vector3 translate(Vector3 vector) {
+      return new Vector3(x + vector.x, y + vector.y, z + vector.z);
+    }
   }
 
-  record Brick(String name, Vector3 v1, Vector3 v2) implements Comparable<Brick> {
+  record Brick(String name, Vector3 v1, Vector3 v2) {
 
-    public boolean intersectsZ(int z) {
-      return Math.min(v1.z, v2.z) <= z && Math.max(v1.z, v2.z) >= z;
+    public Brick translate(Vector3 vector) {
+      return new Brick(name, v1.translate(vector), v2.translate(vector));
     }
 
-    public boolean intersectsX(int x) {
-      return Math.min(v1.x, v2.x) <= x && Math.max(v1.x, v2.x) >= x;
+    public int x(IntBinaryOperator op) {
+      return op.applyAsInt(v1.x, v2.x);
     }
 
-    public boolean intersectsY(int y) {
-      return Math.min(v1.y, v2.y) <= y && Math.max(v1.y, v2.y) >= y;
+    public int y(IntBinaryOperator op) {
+      return op.applyAsInt(v1.y, v2.y);
     }
 
-    @Override
-    public int compareTo(final Brick o) {
-      return ComparisonChain.start()
-          .compare(Math.max(v1.z(), v2.x()), Math.max(o.v1.z(), o.v2.x()))
-          .result();
+    public int z(IntBinaryOperator op) {
+      return op.applyAsInt(v1.z, v2.z);
+    }
+
+    public boolean intersectsInXY(Brick other) {
+      var ls1 = new LineSegment(
+              new Coordinate(this.v1.x, this.v1.y),
+              new Coordinate(this.v2.x, this.v2.y)
+      );
+      var ls2 = new LineSegment(
+              new Coordinate(other.v1.x, other.v1.y),
+              new Coordinate(other.v2.x, other.v2.y)
+      );
+      return ls1.intersection(ls2) != null;
     }
   }
 
   @Test
   public void part1WithMockData() {
-    final var bricks = bricks(Input.mockInput("""
-        1,0,1~1,2,1
-        0,0,2~2,0,2
-        0,2,3~2,2,3
-        0,0,4~0,2,4
-        2,0,5~2,2,5
-        0,1,6~2,1,6
-        1,1,8~1,1,9
-        """));
-
-    debugInX(bricks);
-    System.out.println();
-    debugInY(bricks);
-
-    var updated = drop(bricks);
-    debugInX(updated);
-    System.out.println();
-    debugInY(updated);
+    assertEquals(5, numberOfRemovableBricks(mockInput("""
+            1,0,1~1,2,1
+            0,0,2~2,0,2
+            0,2,3~2,2,3
+            0,0,4~0,2,4
+            2,0,5~2,2,5
+            0,1,6~2,1,6
+            1,1,8~1,1,9
+            """)));
   }
 
-  private SortedSet<Brick> drop(final SortedSet<Brick> bricks) {
+  @Test
+  public void part1() {
+    assertEquals(503, numberOfRemovableBricks(input(this)));
+  }
+
+  @Test
+  public void part2WithMockData() {
+    assertEquals(7, sumOfFallingBricks(mockInput("""
+            1,0,1~1,2,1
+            0,0,2~2,0,2
+            0,2,3~2,2,3
+            0,0,4~0,2,4
+            2,0,5~2,2,5
+            0,1,6~2,1,6
+            1,1,8~1,1,9
+            """)));
+  }
+
+  @Test
+  public void part2() {
+    assertEquals(98431, sumOfFallingBricks(input(this)));
+  }
+
+  private int numberOfRemovableBricks(Input input) {
+    var bricks = drop(bricks(input));
+
+    var belowMap = belowMap(bricks);
+    var aboveMap = aboveMap(bricks);
+
+    var count = 0;
+    for (Brick brick : bricks) {
+      var removable = true;
+      for (Brick above : aboveMap.get(brick)) {
+        var below = belowMap.get(above);
+        if (below.size() < 2) {
+          removable = false;
+        }
+      }
+      if (removable) {
+        count++;
+      }
+    }
+
+    return count;
+  }
+
+  private int sumOfFallingBricks(Input input) {
+    var bricks = drop(bricks(input));
+
+    var belowMap = belowMap(bricks);
+    var aboveMap = aboveMap(bricks);
+
+    var sum = 0;
+
+    for (Brick brick : bricks) {
+      var queue = Lists.<Brick>newLinkedList();
+      queue.add(brick);
+
+      var falling = Sets.newHashSet();
+      falling.add(brick);
+
+      while(!queue.isEmpty()) {
+        var next = queue.poll();
+        for (Brick above : aboveMap.get(next)) {
+          if (falling.containsAll(belowMap.get(above))) {
+            queue.add(above);
+            falling.add(above);
+          }
+        }
+      }
+      sum += falling.size() - 1;
+    }
+
+    return sum;
+  }
+
+  private Multimap<Brick, Brick> aboveMap(Collection<Brick> bricks) {
+    var result = HashMultimap.<Brick, Brick>create();
+    for (Brick brick : bricks) {
+      result.putAll(brick, bricks.stream()
+              .filter(other -> other.z(Math::min) == brick.z(Math::max) + 1)
+              .filter(brick::intersectsInXY)
+              .toList());
+    }
+    return result;
+  }
+
+  private Multimap<Brick, Brick> belowMap(Collection<Brick> bricks) {
+    var result = HashMultimap.<Brick, Brick>create();
+    for (Brick brick : bricks) {
+      result.putAll(brick, bricks.stream()
+              .filter(other -> other.z(Math::max) == brick.z(Math::min) - 1)
+              .filter(brick::intersectsInXY)
+              .toList());
+    }
+    return result;
+  }
+
+  private List<Brick> drop(final List<Brick> bricks) {
     // initialised to 0 == ground
-    var depthMatrix = new char[maxDimension(bricks, Vector3::x)][maxDimension(bricks, Vector3::y)];
-//    for (int x = 0; x < depthMatrix.length; x++) {
-//      for (int y = 0; y < depthMatrix[0].length; y++) {
-//        depthMatrix
-//      }
-//    }
+    var depthMatrix = new int[maxDimension(bricks, Vector3::x) + 1][maxDimension(bricks, Vector3::y) + 1];
 
-    // sort bricks by min(v1.z, v2.z) so that they are in order of closest to the ground
-    // keep track of max z for (x,y) from ground up
-    // iterating bricks, reduce z by difference in min(z) to max(z) from ground
-    // done
+    // Sort bricks by minimum z
+    bricks.sort((b1, b2) -> ComparisonChain.start()
+            .compare(b1.z(Math::min), b2.z(Math::min))
+            .compare(b1.x(Math::min), b2.x(Math::min))
+            .compare(b1.y(Math::min), b2.y(Math::min))
+            .result());
 
-    return ImmutableSortedSet.copyOf(bricks);
+    var result = Lists.<Brick>newArrayList();
+
+    // Drop bricks in order
+    for (Brick brick : bricks) {
+      var max = 0;
+      for (int x = brick.x(Math::min); x < brick.x(Math::max) + 1; x++) {
+        for (int y = brick.y(Math::min); y < brick.y(Math::max) + 1; y++) {
+          max = max(max, depthMatrix[x][y]);
+        }
+      }
+
+      var minZ = brick.z(Math::min);
+      var maxZ = brick.z(Math::max);
+
+      var dropVector = new Vector3(0, 0, -1 * (minZ - (max + 1)));
+
+      // Update depth buffer
+      int updateTo = (maxZ - minZ) + max + 1;
+
+      for (int x = brick.x(Math::min); x < brick.x(Math::max) + 1; x++) {
+        for (int y = brick.y(Math::min); y < brick.y(Math::max) + 1; y++) {
+          depthMatrix[x][y] = updateTo;
+        }
+      }
+
+      result.add(brick.translate(dropVector));
+    }
+
+    return result;
   }
 
-  private SortedSet<Brick> bricks(Input input) {
-    final var result = new TreeSet<Brick>();
+  private List<Brick> bricks(Input input) {
+    final var result = new ArrayList<Brick>();
     char name = 'A';
     for (final String line : input.lines()) {
       var parts = line.split("~");
@@ -96,72 +227,18 @@ public class Day22Test {
       final var v1 = Utils.parseNumbers(parts[0], ",");
       final var v2 = Utils.parseNumbers(parts[1], ",");
       result.add(new Brick(
-          String.valueOf(name++),
-          new Vector3(v1.get(0).intValue(), v1.get(1).intValue(), v1.get(2).intValue()),
-          new Vector3(v2.get(0).intValue(), v2.get(1).intValue(), v2.get(2).intValue())
+              String.valueOf(name++),
+              new Vector3(v1.get(0).intValue(), v1.get(1).intValue(), v1.get(2).intValue()),
+              new Vector3(v2.get(0).intValue(), v2.get(1).intValue(), v2.get(2).intValue())
       ));
     }
     return result;
   }
 
-  private void debugInX(Collection<Brick> bricks) {
-    var maxX = maxDimension(bricks, Vector3::x);
-    var maxZ = maxDimension(bricks, Vector3::z);
-
-    System.out.println(" x ");
-    IntStream.range(0, maxX + 1).forEach(System.out::print);
-    System.out.println();
-
-    for (int z = maxZ; z > 0; z--) {
-      final int finalZ = z;
-      var onZ = bricks.stream().filter(b -> b.intersectsZ(finalZ)).toList();
-      for (int x = 0; x < maxX + 1; x++) {
-        final int finalX = x;
-        final var list = onZ.stream().filter(b -> b.intersectsX(finalX)).toList();
-        if (list.isEmpty()) {
-          System.out.print(".");
-        } else if (list.size() > 1) {
-          System.out.print('?');
-        } else {
-          System.out.print(list.get(0).name);
-        }
-      }
-      System.out.println(" " + z);
-    }
-    System.out.println("-".repeat(maxX + 1) + " 0");
-  }
-
-  private void debugInY(Collection<Brick> bricks) {
-    var maxY = maxDimension(bricks, Vector3::y);
-    var maxZ = maxDimension(bricks, Vector3::z);
-
-    System.out.println(" y ");
-    IntStream.range(0, maxY + 1).forEach(System.out::print);
-    System.out.println();
-
-    for (int z = maxZ; z > 0; z--) {
-      final int finalZ = z;
-      var onZ = bricks.stream().filter(b -> b.intersectsZ(finalZ)).toList();
-      for (int y = 0; y < maxY + 1; y++) {
-        final int finalY = y;
-        final var list = onZ.stream().filter(b -> b.intersectsY(finalY)).toList();
-        if (list.isEmpty()) {
-          System.out.print(".");
-        } else if (list.size() > 1) {
-          System.out.print('?');
-        } else {
-          System.out.print(list.get(0).name);
-        }
-      }
-      System.out.println(" " + z);
-    }
-    System.out.println("-".repeat(maxY + 1) + " 0");
-  }
-
   private int maxDimension(final Collection<Brick> bricks, final Function<Vector3, Integer> fun) {
     return bricks.stream()
-        .mapToInt(b -> Math.max(fun.apply(b.v1), fun.apply(b.v2)))
-        .max()
-        .orElse(0);
+            .mapToInt(b -> max(fun.apply(b.v1), fun.apply(b.v2)))
+            .max()
+            .orElse(0);
   }
 }
