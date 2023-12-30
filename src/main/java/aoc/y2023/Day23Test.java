@@ -164,7 +164,7 @@ public class Day23Test {
       }
     }
 
-    compact(graph);
+    contractEdges(graph);
 
     return graph;
   }
@@ -187,10 +187,11 @@ public class Day23Test {
     }
   }
 
-  private void compact(MutableValueGraph<String, Integer> graph) {
+  private void contractEdges(final MutableValueGraph<String, Integer> graph) {
     for (String node : ImmutableList.copyOf(graph.nodes())) {
       var successors = graph.successors(node);
       var predecessors = graph.predecessors(node);
+
       if (successors.size() == 2 && predecessors.size() == 2) {
         Iterator<String> iterator = successors.iterator();
         String first = iterator.next();
