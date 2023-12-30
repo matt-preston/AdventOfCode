@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.LineSegment;
 import utils.AdventOfCode;
 import utils.Input;
 import utils.Utils;
+import utils.Vector3;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,18 +23,6 @@ import static utils.Input.mockInput;
 @AdventOfCode(year = 2023, day = 22)
 public class Day22Test {
 
-  record Vector3(int x, int y, int z) {
-
-    @Override
-    public String toString() {
-      return "(" + x + "," + y + "," + z + ")";
-    }
-
-    public Vector3 translate(Vector3 vector) {
-      return new Vector3(x + vector.x, y + vector.y, z + vector.z);
-    }
-  }
-
   record Brick(String name, Vector3 v1, Vector3 v2) {
 
     public Brick translate(Vector3 vector) {
@@ -41,25 +30,25 @@ public class Day22Test {
     }
 
     public int x(IntBinaryOperator op) {
-      return op.applyAsInt(v1.x, v2.x);
+      return op.applyAsInt((int) v1.x(), (int) v2.x());
     }
 
     public int y(IntBinaryOperator op) {
-      return op.applyAsInt(v1.y, v2.y);
+      return op.applyAsInt((int) v1.y(), (int) v2.y());
     }
 
     public int z(IntBinaryOperator op) {
-      return op.applyAsInt(v1.z, v2.z);
+      return op.applyAsInt((int) v1.z(), (int) v2.z());
     }
 
     public boolean intersectsInXY(Brick other) {
       var ls1 = new LineSegment(
-              new Coordinate(this.v1.x, this.v1.y),
-              new Coordinate(this.v2.x, this.v2.y)
+              new Coordinate(this.v1.x(), this.v1.y()),
+              new Coordinate(this.v2.x(), this.v2.y())
       );
       var ls2 = new LineSegment(
-              new Coordinate(other.v1.x, other.v1.y),
-              new Coordinate(other.v2.x, other.v2.y)
+              new Coordinate(other.v1.x(), other.v1.y()),
+              new Coordinate(other.v2.x(), other.v2.y())
       );
       return ls1.intersection(ls2) != null;
     }
@@ -178,7 +167,7 @@ public class Day22Test {
 
   private List<Brick> drop(final List<Brick> bricks) {
     // initialised to 0 == ground
-    var depthMatrix = new int[maxDimension(bricks, Vector3::x) + 1][maxDimension(bricks, Vector3::y) + 1];
+    var depthMatrix = new int[maxDimension(bricks, v -> (int) v.x()) + 1][maxDimension(bricks, v -> (int) v.y()) + 1];
 
     // Sort bricks by minimum z
     bricks.sort((b1, b2) -> ComparisonChain.start()

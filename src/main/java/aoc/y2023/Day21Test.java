@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
 import utils.Utils;
-import utils.Vector;
+import utils.Vector2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Utils.predictNthInQuadratic;
@@ -20,7 +20,7 @@ import static utils.Utils.predictNthInQuadratic;
 @AdventOfCode(year = 2023, day = 21)
 public class Day21Test {
 
-  record Node(String name, Map<Node, Vector> edges, AtomicBoolean start) {
+  record Node(String name, Map<Node, Vector2> edges, AtomicBoolean start) {
 
     public static String name(int x, int y) {
       return x + "," + y;
@@ -30,7 +30,7 @@ public class Day21Test {
       this(name, Maps.newHashMap(), new AtomicBoolean(false));
     }
 
-    public void addConnected(Node connected, Vector mapVector) {
+    public void addConnected(Node connected, Vector2 mapVector) {
       edges.put(connected, mapVector);
     }
 
@@ -120,11 +120,11 @@ public class Day21Test {
         .findAny()
         .orElseThrow();
 
-    record GridNode(Vector position, Node node) { }
+    record GridNode(Vector2 position, Node node) { }
 
     var visited = Sets.<GridNode>newHashSet();
     var frontier = Sets.<GridNode>newHashSet();
-    frontier.add(new GridNode(new Vector(0, 0), start));
+    frontier.add(new GridNode(new Vector2(0, 0), start));
 
     var count = 0;
 
@@ -133,8 +133,8 @@ public class Day21Test {
       visited.clear();
 
       for (final GridNode current : frontier) {
-        for (final Map.Entry<Node, Vector> entry : current.node.edges.entrySet()) {
-          var newPosition = current.position().add(entry.getValue());
+        for (final Map.Entry<Node, Vector2> entry : current.node.edges.entrySet()) {
+          var newPosition = current.position().translate(entry.getValue());
           var newGridNode = new GridNode(newPosition, entry.getKey());
 
           if (!visited.contains(newGridNode)) {
@@ -174,22 +174,22 @@ public class Day21Test {
 
   // make the graph wrap top/bottom and left/right
   private void addConnectedNode(Node node, int x, int y, char[][] matrix, Map<String, Node> graph, boolean withWrap) {
-    var vector = new Vector(0, 0);
+    var vector = new Vector2(0, 0);
 
     if (withWrap) {
       if (x < 0) {
         x = matrix[0].length - 1;
-        vector = new Vector(-1, 0);
+        vector = new Vector2(-1, 0);
       } else if (x >= matrix[0].length) {
         x = 0;
-        vector = new Vector(1, 0);
+        vector = new Vector2(1, 0);
       }
       if (y < 0) {
         y = matrix.length - 1;
-        vector = new Vector(0, -1);
+        vector = new Vector2(0, -1);
       } else if (y >= matrix.length) {
         y = 0;
-        vector = new Vector(0, 1);
+        vector = new Vector2(0, 1);
       }
     }
 
