@@ -14,13 +14,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 
+import static java.lang.Integer.parseInt;
+import static java.util.Comparator.comparingInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
 
 @SuppressWarnings({"UnstableApiUsage", "DataFlowIssue"})
 @AdventOfCode(year = 2023, day = 23)
-public class Day23Test {
+public class Day23Solution {
 
   enum Direction {
     LEFT,
@@ -79,7 +81,7 @@ public class Day23Test {
     var graph = build(input, true);
 
     var start = start(graph);
-    var target = target(graph, input.lines().size());
+    var target = target(graph);
 
     record State(String node, String previous, int cost) {}
 
@@ -106,7 +108,7 @@ public class Day23Test {
 
   private int maxNumberOfStepsRecursively(final Input input) {
     var graph = build(input, false);
-    return maxNumberOfSteps(start(graph), target(graph, input.lines().size()), graph, 0, Sets.newHashSet());
+    return maxNumberOfSteps(start(graph), target(graph), graph, 0, Sets.newHashSet());
   }
 
   private int maxNumberOfSteps(String current, String target, ValueGraph<String, Integer> graph, int length, Set<String> path) {
@@ -114,16 +116,14 @@ public class Day23Test {
       return length;
     }
 
-    if (path.contains(current)) {
-      return 0;
-    }
-
     path.add(current);
 
     var max = 0;
     for (String node : graph.adjacentNodes(current)) {
-      Integer cost = graph.edgeValueOrDefault(current, node, 1);
-      max = Math.max(max, maxNumberOfSteps(node, target, graph, length + cost, path));
+      if (!path.contains(node)) {
+        Integer cost = graph.edgeValueOrDefault(current, node, 1);
+        max = Math.max(max, maxNumberOfSteps(node, target, graph, length + cost, path));
+      }
     }
 
     path.remove(current);
@@ -138,10 +138,9 @@ public class Day23Test {
             .orElseThrow();
   }
 
-  private static String target(ValueGraph<String, Integer> graph, int numRows) {
+  private static String target(ValueGraph<String, Integer> graph) {
     return graph.nodes().stream()
-            .filter(n -> n.endsWith("," + (numRows - 1)))
-            .findFirst()
+            .max(comparingInt(n -> parseInt(n.split(",")[1])))
             .orElseThrow();
   }
 
