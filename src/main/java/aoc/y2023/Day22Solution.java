@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
 
-@AdventOfCode(year = 2023, day = 22)
-public class Day22Test {
+@AdventOfCode(year = 2023, day = 22, name = "Sand Slabs")
+public class Day22Solution {
 
   record Brick(String name, Vector3 v1, Vector3 v2) {
 

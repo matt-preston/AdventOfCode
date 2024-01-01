@@ -12,4 +12,6 @@ public @interface AdventOfCode {
   int year();
 
   int day();
+
+  String name() default "";
 }

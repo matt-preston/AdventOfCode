@@ -1,7 +1,6 @@
 package aoc.y2023;
 
 import com.google.common.collect.Sets;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineSegment;
@@ -14,8 +13,7 @@ import java.util.Set;
 import static com.google.common.collect.Iterators.limit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@AdventOfCode(year = 2023, day = 24)
-@DisplayName(value = "Day 24: Never Tell Me The Odds")
+@AdventOfCode(year = 2023, day = 24, name = "Never Tell Me The Odds")
 public class Day24Solution {
 
   public static final String MOCK = """

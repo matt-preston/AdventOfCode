@@ -4,7 +4,6 @@ import org.jgrapht.Graph;
 import org.jgrapht.alg.StoerWagnerMinimumCut;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
@@ -13,8 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
 
-@AdventOfCode(year = 2023, day = 25)
-@DisplayName(value = "Day 25: Snowverload")
+@AdventOfCode(year = 2023, day = 25, name = "Snowverload")
 public class Day25Solution {
 
     private static final String MOCK = """
@@ -34,7 +32,7 @@ public class Day25Solution {
             """;
 
     @Test
-    public void part1WithMockData2() {
+    public void part1WithMockData() {
         assertEquals(54, productOfMinCutPartitions(mockInput(MOCK)));
     }
 

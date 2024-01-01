@@ -21,7 +21,7 @@ import static utils.Input.input;
 import static utils.Input.mockInput;
 
 @SuppressWarnings({"UnstableApiUsage", "DataFlowIssue"})
-@AdventOfCode(year = 2023, day = 23)
+@AdventOfCode(year = 2023, day = 23, name = "A Long Walk")
 public class Day23Solution {
 
   enum Direction {
