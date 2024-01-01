@@ -14,7 +14,7 @@ import static utils.Input.input;
 import static utils.Input.mockInput;
 
 @AdventOfCode(year = 2023, day = 25)
-@DisplayName(value = "Day 25 - Snowverload")
+@DisplayName(value = "Day 25: Snowverload")
 public class Day25Solution {
 
     private static final String MOCK = """
