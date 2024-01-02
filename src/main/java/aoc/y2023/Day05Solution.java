@@ -1,17 +1,19 @@
 package aoc.y2023;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.TreeSet;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.regex.Pattern.compile;
+import static java.util.stream.Collectors.toCollection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
@@ -19,14 +21,6 @@ import static utils.Utils.parseNumbers;
 
 @AdventOfCode(year = 2023, day = 5, name = "If You Give A Seed A Fertilizer")
 public class Day05Solution {
-
-    public static final String SEED_TO_SOIL = "seed-to-soil";
-    public static final String SOIL_TO_FERTILIZER = "soil-to-fertilizer";
-    public static final String FERTILIZER_TO_WATER = "fertilizer-to-water";
-    public static final String WATER_TO_LIGHT = "water-to-light";
-    public static final String LIGHT_TO_TEMPERATURE = "light-to-temperature";
-    public static final String TEMPERATURE_TO_HUMIDITY = "temperature-to-humidity";
-    public static final String HUMIDITY_TO_LOCATION = "humidity-to-location";
 
     public static final String MOCK = """
             seeds: 79 14 55 13
@@ -64,124 +58,145 @@ public class Day05Solution {
             56 93 4
             """;
 
-    record Ranges(List<Range> ranges) {
+    record Range(long srcStart, long destStart, long length) implements Comparable<Range> {
+        boolean contains(long value) {
+            return srcStart <= value && srcStart + length > value;
+        }
 
-        public long map(final long source) {
-            for (final Range range : this.ranges) {
-                if (range.srcRangeStart <= source && range.srcRangeStart + range.length > source) {
-                    return range.destRangeStart + (source - range.srcRangeStart);
-                }
-            }
-            return source;
+        long map(long value) {
+            return destStart + (value - srcStart);
+        }
+
+        @Override
+        public int compareTo(Range o) {
+            return Long.compare(srcStart, o.srcStart);
+        }
+
+        Range reverse() {
+            return new Range(destStart, srcStart, length);
         }
     }
 
-    record Range(long destRangeStart, long srcRangeStart, long length) {
+    record Mapping(String name, Collection<Range> ranges) {
+        long map(final long value) {
+            for (Range range : ranges) {
+                if (range.contains(value)) {
+                    return range.map(value);
+                }
+            }
+            return value;
+        }
 
+        Mapping reverse() {
+            return new Mapping(name + "(rev)", ranges.stream()
+                    .map(Range::reverse)
+                    .collect(toCollection(TreeSet::new)));
+        }
+    }
+
+    record Pipeline(List<Mapping> mappings) {
+        long map(final long value) {
+            var result = value;
+            for (Mapping mapping : mappings) {
+                result = mapping.map(result);
+            }
+            return result;
+        }
+
+        Pipeline reverse() {
+            return new Pipeline(mappings.stream()
+                    .map(Mapping::reverse)
+                    .toList()
+                    .reversed());
+        }
     }
 
     @Test
     public void part1WithMockData() {
-        assertEquals(35, part1Solution(mockInput(MOCK)));
+        assertEquals(35, lowestLocation(mockInput(MOCK)));
     }
 
     @Test
     public void part1() {
-        assertEquals(165788812, part1Solution(input(this)));
+        assertEquals(165788812, lowestLocation(input(this)));
     }
 
     @Test
     public void part2WithMockData() throws Exception {
-        assertEquals(46, part2Solution(mockInput(MOCK)));
+        assertEquals(46, lowestLocationForSeedRanges(mockInput(MOCK)));
     }
 
     @Test
     public void part2() throws Exception {
-        assertEquals(1928058, part2Solution(input(this)));
+        assertEquals(1928058, lowestLocationForSeedRanges(input(this)));
     }
 
-    private long part1Solution(final Input input) {
+    private long lowestLocation(final Input input) {
         final var seeds = seeds(input.text());
-        final var maps = getMaps(input);
+        final var pipeline = build(input);
 
         long closest = Long.MAX_VALUE;
         for (final Long seed : seeds) {
-            closest = Math.min(closest, location(seed, maps));
+            closest = Math.min(closest, pipeline.map(seed));
         }
 
         return closest;
     }
 
-    private long part2Solution(final Input input) throws Exception {
-        final var seeds = seeds(input.text());
-        final var maps = getMaps(input);
+    private long lowestLocationForSeedRanges(final Input input) {
+        final var seedRanges = Lists.partition(seeds(input.text()), 2);
+        final var pipeline = build(input).reverse();
 
-        final var groups = Lists.partition(seeds, 2);
+        for (long location = 0; location < 5_000_000; location++) {
+            final var seed = pipeline.map(location);
 
-        final var executor = Executors.newCachedThreadPool();
-        var futures = Lists.<Future<Long>>newArrayList();
-        for (final List<Long> seedGroup : groups) {
-            futures.add(executor.submit(() -> closest(maps, seedGroup.get(0), seedGroup.get(1))));
+            // see if this seed is in one of the ranges
+            for (List<Long> seedRange : seedRanges) {
+                long start = seedRange.get(0);
+                long length = seedRange.get(1);
+
+                if (start <= seed && start + length > seed) {
+                    return location;
+                }
+            }
         }
 
-        var closest = Long.MAX_VALUE;
-        for (final Future<Long> future : futures) {
-            closest = Math.min(closest, future.get());
-        }
-
-        executor.close();
-        return closest;
+        throw new IllegalStateException("Couldn't find a seed in one of the expected ranges");
     }
 
-    private Map<String, Ranges> getMaps(final Input input) {
-        return Map.of(
-                SEED_TO_SOIL, map(input.text(), SEED_TO_SOIL),
-                SOIL_TO_FERTILIZER, map(input.text(), SOIL_TO_FERTILIZER),
-                FERTILIZER_TO_WATER, map(input.text(), FERTILIZER_TO_WATER),
-                WATER_TO_LIGHT, map(input.text(), WATER_TO_LIGHT),
-                LIGHT_TO_TEMPERATURE, map(input.text(), LIGHT_TO_TEMPERATURE),
-                TEMPERATURE_TO_HUMIDITY, map(input.text(), TEMPERATURE_TO_HUMIDITY),
-                HUMIDITY_TO_LOCATION, map(input.text(), HUMIDITY_TO_LOCATION)
+    private Pipeline build(Input input) {
+        List<Mapping> mappings = ImmutableList.of(
+                mapping(input.text(), "seed-to-soil"),
+                mapping(input.text(), "soil-to-fertilizer"),
+                mapping(input.text(), "fertilizer-to-water"),
+                mapping(input.text(), "water-to-light"),
+                mapping(input.text(), "light-to-temperature"),
+                mapping(input.text(), "temperature-to-humidity"),
+                mapping(input.text(), "humidity-to-location")
         );
+
+        return new Pipeline(mappings);
     }
 
-    private long closest(final Map<String, Ranges> maps, long seedRangeStart, long seedRangeLength) {
-        var closest = Long.MAX_VALUE;
-        for (int i = 0; i < seedRangeLength; i++) {
-            closest = Math.min(closest, location(seedRangeStart + i, maps));
+    private Mapping mapping(final String input, final String name) {
+        final var matcher = compile(name + " map:\\n([\\d\\n ]+)").matcher(input);
+        if (matcher.find()) {
+            var result = Sets.<Range>newTreeSet();
+
+            final var lines = matcher.group(1).trim().split("\n");
+            for (final String line : lines) {
+                final var numbers = parseNumbers(line);
+                checkState(numbers.size() == 3);
+                result.add(new Range(numbers.get(1), numbers.get(0), numbers.get(2)));
+            }
+            return new Mapping(name, result);
         }
-        return closest;
-    }
-
-    private long location(final Long seed, final Map<String, Ranges> maps) {
-        final var soil = maps.get(SEED_TO_SOIL).map(seed);
-        final var fertiliser = maps.get(SOIL_TO_FERTILIZER).map(soil);
-        final var water = maps.get(FERTILIZER_TO_WATER).map(fertiliser);
-        final var light = maps.get(WATER_TO_LIGHT).map(water);
-        final var temperature = maps.get(LIGHT_TO_TEMPERATURE).map(light);
-        final var humidity = maps.get(TEMPERATURE_TO_HUMIDITY).map(temperature);
-        return maps.get(HUMIDITY_TO_LOCATION).map(humidity);
+        throw new IllegalStateException();
     }
 
     private List<Long> seeds(final String input) {
         final var matcher = compile("seeds: ([\\d ]+)").matcher(input);
         checkState(matcher.find());
         return parseNumbers(matcher.group(1));
-    }
-
-    private Ranges map(final String input, final String name) {
-        final var matcher = compile(name + " map:\\n([\\d\\n ]+)").matcher(input);
-        if (matcher.find()) {
-            var result = Lists.<Range>newArrayList();
-
-            final var lines = matcher.group(1).trim().split("\n");
-            for (final String line : lines) {
-                final var numbers = parseNumbers(line);
-                checkState(numbers.size() == 3);
-                result.add(new Range(numbers.get(0), numbers.get(1), numbers.get(2)));
-            }
-            return new Ranges(result);
-        }
-        throw new IllegalStateException();
     }
 }
