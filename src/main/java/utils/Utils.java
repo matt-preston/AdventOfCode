@@ -43,4 +43,11 @@ public class Utils {
   public static long predictNthInQuadratic(long n, long first, long second, long third) {
     return first + n * (second - first + (n - 1) * (third - second - second + first) / 2);
   }
+
+  public static long triangleSeries(long nth) {
+    if (nth < 1) {
+      return 0;
+    }
+    return (nth * (nth + 1)) / 2;
+  }
 }
