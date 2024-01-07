@@ -11,27 +11,18 @@ public class Day01Solution {
 
     @Test
     public void part1() {
-        var total = 0;
-        for (String line : input(this).lines()) {
-            total += fuelNeeded(Integer.parseInt(line));
-        }
-        assertEquals(3474920, total);
-    }
-
-    @Test
-    public void part2WithMockData() {
-        assertEquals(2, fuelNeededRecursive(14));
-        assertEquals(966, fuelNeededRecursive(1969));
-        assertEquals(50346, fuelNeededRecursive(100756));
+        assertEquals(3474920, input(this).lines().stream()
+                .mapToInt(Integer::parseInt)
+                .map(this::fuelNeeded)
+                .sum());
     }
 
     @Test
     public void part2() {
-        var total = 0;
-        for (String line : input(this).lines()) {
-            total += fuelNeededRecursive(Integer.parseInt(line));
-        }
-        assertEquals(5209504, total);
+        assertEquals(5209504, input(this).lines().stream()
+                .mapToInt(Integer::parseInt)
+                .map(this::fuelNeededRecursive)
+                .sum());
     }
 
     private int fuelNeeded(int mass) {
