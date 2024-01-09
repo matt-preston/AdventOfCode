@@ -24,11 +24,19 @@ public class IO {
         }
     }
 
-    public void output(int value) {
+    void output(int value) {
         this.output.add(value);
+    }
+
+    public boolean hasOutput() {
+        return !output.isEmpty();
     }
 
     public List<Integer> output() {
         return this.output;
+    }
+
+    public void queueInput(int value) {
+        this.input.add(value);
     }
 }

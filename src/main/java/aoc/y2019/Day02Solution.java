@@ -17,7 +17,7 @@ public class Day02Solution {
     public void part1WithMockData() {
         Memory memory = Memory.init(mockInput("1,9,10,3,2,3,11,0,99,30,40,50"));
         final var computer = new Computer(memory);
-        computer.run();
+        computer.runToCompletion();
 
         assertEquals(3500, memory.read(0));
     }
@@ -48,7 +48,7 @@ public class Day02Solution {
         memory.write(2, verb);
 
         var computer = new Computer(memory);
-        computer.run();
+        computer.runToCompletion();
 
         return memory.read(0);
     }

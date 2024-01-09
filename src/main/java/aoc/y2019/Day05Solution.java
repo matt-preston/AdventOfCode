@@ -88,7 +88,7 @@ public class Day05Solution {
     public void part1() {
         Memory memory = Memory.init(input(this));
         final var computer = new Computer(memory, new IO(ImmutableList.of(1)));
-        computer.run();
+        computer.runToCompletion();
 
         final var output = computer.io().output();
 
@@ -118,7 +118,7 @@ public class Day05Solution {
 
     private void assertOutput(int expectedOutput, Input program, int input) {
         var computer = new Computer(Memory.init(program), new IO(ImmutableList.of(input)));
-        computer.run();
+        computer.runToCompletion();
         assertEquals(List.of(expectedOutput), computer.io().output());
     }
 }
