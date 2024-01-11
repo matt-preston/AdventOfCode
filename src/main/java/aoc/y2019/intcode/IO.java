@@ -7,15 +7,15 @@ import java.util.Queue;
 
 public class IO {
 
-    private final Queue<Integer> input;
-    private final List<Integer> output;
+    private final Queue<Long> input;
+    private final List<Long> output;
 
-    public IO(List<Integer> input) {
+    public IO(List<Long> input) {
         this.input = Lists.newLinkedList(input);
         this.output = Lists.newArrayList();
     }
 
-    public int input() {
+    public long input() {
         final var poll = input.poll();
         if (poll != null) {
             return poll;
@@ -24,7 +24,7 @@ public class IO {
         }
     }
 
-    void output(int value) {
+    void output(long value) {
         this.output.add(value);
     }
 
@@ -32,11 +32,11 @@ public class IO {
         return !output.isEmpty();
     }
 
-    public List<Integer> output() {
+    public List<Long> output() {
         return this.output;
     }
 
-    public void queueInput(int value) {
+    public void queueInput(long value) {
         this.input.add(value);
     }
 }

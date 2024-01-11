@@ -57,12 +57,12 @@ public class Day07Solution {
         assertEquals(84088865, maxAmplifierOutputWithFeedback(input(this)));
     }
 
-    private int maxAmplifierOutput(Input input) {
+    private long maxAmplifierOutput(Input input) {
         var memory = Memory.init(input);
-        var maxOutput = 0;
-        for (List<Integer> permutation : permutations(List.of(0, 1, 2, 3, 4))) {
-            var output = 0;
-            for (Integer phase : permutation) {
+        var maxOutput = 0L;
+        for (List<Long> permutation : permutations(List.of(0L, 1L, 2L, 3L, 4L))) {
+            var output = 0L;
+            for (Long phase : permutation) {
                 final var amplifier = new Computer(memory.copy(), new IO(ImmutableList.of(phase, output)));
                 amplifier.runToCompletion();
                 output = amplifier.io().output().get(0);
@@ -72,16 +72,16 @@ public class Day07Solution {
         return maxOutput;
     }
 
-    private int maxAmplifierOutputWithFeedback(Input input) {
+    private long maxAmplifierOutputWithFeedback(Input input) {
         var memory = Memory.init(input);
-        var maxOutput = 0;
-        for (List<Integer> permutation : permutations(List.of(5, 6, 7, 8, 9))) {
+        var maxOutput = 0L;
+        for (List<Long> permutation : permutations(List.of(5L, 6L, 7L, 8L, 9L))) {
             final var amplifiers = permutation.stream()
                     .map(p -> new Computer(memory.copy(), new IO(ImmutableList.of(p))))
                     .toList();
 
             var running = true;
-            var output = 0;
+            var output = 0L;
             while (running) {
                 for (Computer amplifier : amplifiers) {
                     amplifier.io().queueInput(output);

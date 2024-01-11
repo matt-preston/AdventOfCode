@@ -2,15 +2,15 @@ package aoc.y2019.intcode;
 
 public class Opcode {
 
-    public static Opcode decode(int value) {
+    public static Opcode decode(long value) {
         return new Opcode(value);
     }
 
     private final int opcode;
-    private int parameterModes;
+    private long parameterModes;
 
-    private Opcode(int value) {
-        this.opcode = value % 100;
+    private Opcode(long value) {
+        this.opcode = (int) (value % 100);
         this.parameterModes = value / 100;
     }
 
@@ -19,7 +19,7 @@ public class Opcode {
     }
 
     public int nextParameterMode() {
-        var next = parameterModes % 10;
+        var next = (int) (parameterModes % 10);
         parameterModes /= 10;
         return next;
     }

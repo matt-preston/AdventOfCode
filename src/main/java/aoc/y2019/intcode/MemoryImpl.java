@@ -1,27 +1,32 @@
 package aoc.y2019.intcode;
 
-import java.util.Arrays;
+import static com.google.common.base.Preconditions.checkState;
 
 class MemoryImpl implements Memory {
 
-    private final int[] memory;
+    private final long[] memory;
 
-    MemoryImpl(int[] memory) {
-        this.memory = memory;
+    MemoryImpl(long[] memory) {
+        this.memory = new long[1100];
+        System.arraycopy(memory, 0, this.memory, 0, memory.length);
     }
 
     @Override
-    public int read(int address) {
-        return memory[address];
+    public long read(long address) {
+        checkState(address >= 0, "Attempting to use a negative address");
+        checkState(address < Integer.MAX_VALUE, "Attempting to address beyond the range of an int");
+        return memory[(int) address];
     }
 
     @Override
-    public void write(int address, int value) {
-        memory[address] = value;
+    public void write(long address, long value) {
+        checkState(address >= 0, "Attempting to use a negative address");
+        checkState(address < Integer.MAX_VALUE, "Attempting to address beyond the range of an int");
+        memory[(int)address] = value;
     }
 
     @Override
     public Memory copy() {
-        return new MemoryImpl(Arrays.copyOf(memory, memory.length));
+        return new MemoryImpl(memory);
     }
 }

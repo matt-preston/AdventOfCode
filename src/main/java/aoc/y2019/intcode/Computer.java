@@ -6,8 +6,9 @@ public class Computer {
 
     private final Memory memory;
     private final IO io;
-    private int pc = 0;
+    private long pc = 0;
     private boolean running;
+    private long relativeBase;
 
     public Computer(Memory memory) {
       this(memory, new IO(Lists.newLinkedList()));
@@ -17,6 +18,7 @@ public class Computer {
         this.memory = memory;
         this.io = io;
         this.running = true;
+        this.relativeBase = 0;
     }
 
     public Memory memory() {
@@ -87,23 +89,33 @@ public class Computer {
                 var p3 = outputParameter(opcode.nextParameterMode());
                 memory.write(p3, p1 == p2 ? 1 : 0);
             }
+            case 9 -> { // adjust relative base
+                var p1 = inputParameter(opcode.nextParameterMode());
+                relativeBase += p1;
+            }
             case 99 -> running = false;
             default -> throw new IllegalStateException("Unknown opcode: " + opcode.opcode());
         }
     }
 
-    private int inputParameter(int parameterMode) {
+    private long inputParameter(int parameterMode) {
         return switch (parameterMode) {
             case 0 -> memory.read(memory.read(pc++));
             case 1 -> memory.read(pc++);
-            default -> throw new IllegalStateException();
+            case 2 -> memory.read(relativeBase + memory.read(pc++));
+            default -> throw unexpectedParameterMode(parameterMode);
         };
     }
 
-    private int outputParameter(int parameterMode) {
+    private long outputParameter(int parameterMode) {
         return switch (parameterMode) {
             case 0 -> memory.read(pc++);
-            default -> throw new IllegalStateException();
+            case 2 -> relativeBase + memory.read(pc++);
+            default -> throw unexpectedParameterMode(parameterMode);
         };
+    }
+
+    private IllegalStateException unexpectedParameterMode(int parameterMode) {
+        return new IllegalStateException("Unexpected parameter mode: [" + parameterMode + "]");
     }
 }

@@ -9,15 +9,14 @@ public interface Memory {
     static Memory init(Input input) {
         final var array = Arrays.stream(input.text().split(","))
                 .map(String::trim)
-                .mapToInt(Integer::parseInt)
+                .mapToLong(Long::parseLong)
                 .toArray();
         return new MemoryImpl(array);
     }
 
+    long read(long address);
 
-    int read(int address);
-
-    void write(int address, int value);
+    void write(long address, long value);
 
     Memory copy();
 }

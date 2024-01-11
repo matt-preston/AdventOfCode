@@ -43,7 +43,7 @@ public class Day02Solution {
         fail("Did not find the right values");
     }
 
-    private int executeWithReplacements(Memory memory, int noun, int verb) {
+    private long executeWithReplacements(Memory memory, int noun, int verb) {
         memory.write(1, noun);
         memory.write(2, verb);
 
