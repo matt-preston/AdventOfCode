@@ -85,7 +85,7 @@ public class Day07Solution {
             while (running) {
                 for (Computer amplifier : amplifiers) {
                     amplifier.io().queueInput(output);
-                    while (amplifier.io().hasOutput() && amplifier.running()) {
+                    while (!amplifier.io().hasOutput() && amplifier.running()) {
                         amplifier.step();
                     }
                     if (!amplifier.running()) {
