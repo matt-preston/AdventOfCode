@@ -80,18 +80,12 @@ public class Day07Solution {
                     .map(p -> new Computer(memory.copy(), new IO(ImmutableList.of(p))))
                     .toList();
 
-            var running = true;
             var output = 0L;
-            while (running) {
+            while (amplifiers.get(0).running()) {
                 for (Computer amplifier : amplifiers) {
                     amplifier.io().queueInput(output);
-                    while (!amplifier.io().hasOutput() && amplifier.running()) {
-                        amplifier.step();
-                    }
-                    if (!amplifier.running()) {
-                        running = false;
-                    } else {
-                        output = amplifier.io().output().remove(0);
+                    if(amplifier.runUntilOutputAvailable()) {
+                        output = amplifier.io().takeOutput();
                     }
                 }
             }

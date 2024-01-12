@@ -7,7 +7,7 @@ class MemoryImpl implements Memory {
     private final long[] memory;
 
     MemoryImpl(long[] memory) {
-        this.memory = new long[1100];
+        this.memory = new long[1400];
         System.arraycopy(memory, 0, this.memory, 0, memory.length);
     }
 

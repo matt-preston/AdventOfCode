@@ -39,6 +39,14 @@ public class Computer {
         }
     }
 
+    public boolean runUntilOutputAvailable() {
+        while(running() && !io().hasOutput()) {
+            step();
+        }
+
+        return running();
+    }
+
     public void step() {
         var opcode = Opcode.decode(memory.read(pc++));
 

@@ -36,6 +36,10 @@ public class IO {
         return this.output;
     }
 
+    public long takeOutput() {
+        return output.remove(0);
+    }
+
     public void queueInput(long value) {
         this.input.add(value);
     }
