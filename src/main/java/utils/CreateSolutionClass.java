@@ -36,6 +36,7 @@ public class CreateSolutionClass {
                 
                 import utils.AdventOfCode;
                 import org.junit.jupiter.api.Test;
+                import utils.Input;
                 
                 import static org.junit.jupiter.api.Assertions.assertEquals;
                 import static utils.Input.input;
