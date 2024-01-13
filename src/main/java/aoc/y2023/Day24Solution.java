@@ -80,9 +80,9 @@ public class Day24Solution {
         while (iter.hasNext()) {
             var hailstone = iter.next();
             // These equations can be simplified...
-            System.out.printf("eq%d = x + (vx*t%d) == %d + (%d * t%d)%n", eqCount++, tCount, hailstone.start.x(), hailstone.velocity().x(), tCount);
-            System.out.printf("eq%d = y + (vy*t%d) == %d + (%d * t%d)%n", eqCount++, tCount, hailstone.start.y(), hailstone.velocity().y(), tCount);
-            System.out.printf("eq%d = z + (vz*t%d) == %d + (%d * t%d)%n", eqCount++, tCount, hailstone.start.z(), hailstone.velocity().z(), tCount);
+            System.out.printf("eq%d = x + (vx*t%d) == %.0f + (%.0f * t%d)%n", eqCount++, tCount, hailstone.start.x(), hailstone.velocity().x(), tCount);
+            System.out.printf("eq%d = y + (vy*t%d) == %.0f + (%.0f * t%d)%n", eqCount++, tCount, hailstone.start.y(), hailstone.velocity().y(), tCount);
+            System.out.printf("eq%d = z + (vz*t%d) == %.0f + (%.0f * t%d)%n", eqCount++, tCount, hailstone.start.z(), hailstone.velocity().z(), tCount);
             tCount++;
         }
 
