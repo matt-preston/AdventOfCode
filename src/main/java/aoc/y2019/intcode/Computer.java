@@ -39,6 +39,13 @@ public class Computer {
         }
     }
 
+    public boolean runUntilInputRequired() {
+        while(running() && (io.hasInputQueued() || !requireInput())) {
+            step();
+        }
+        return running();
+    }
+
     public boolean runUntilOutputAvailable() {
         while(running() && !io().hasOutput()) {
             step();
@@ -104,6 +111,10 @@ public class Computer {
             case 99 -> running = false;
             default -> throw new IllegalStateException("Unknown opcode: " + opcode.opcode());
         }
+    }
+
+    private boolean requireInput() {
+        return Opcode.decode(memory.read(pc)).opcode() == 3;
     }
 
     private long inputParameter(int parameterMode) {

@@ -43,4 +43,8 @@ public class IO {
     public void queueInput(long value) {
         this.input.add(value);
     }
+
+    public boolean hasInputQueued() {
+        return !this.input.isEmpty();
+    }
 }
