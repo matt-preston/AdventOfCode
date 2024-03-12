@@ -11,7 +11,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 
-@AdventOfCode(year = 2019, day = 13, name = "")
+@AdventOfCode(year = 2019, day = 13, name = "Care Package")
 public class Day13Solution {
 
     private static final int WIDTH = 42;
