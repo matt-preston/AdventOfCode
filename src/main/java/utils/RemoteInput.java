@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.String.format;
@@ -22,10 +23,12 @@ import static java.nio.file.Files.writeString;
 
 class RemoteInput implements Input {
 
+    private static AtomicBoolean FIRST = new AtomicBoolean(true);
+
     private final Path inputPath;
 
     RemoteInput(int year, int day) throws Exception {
-        inputPath = Paths.get(format("input/%d/%d-input", year, day));
+        inputPath = Paths.get(format("input/%d/%02d-input", year, day));
 
         if (!inputPath.toFile().exists()) {
             var parent = inputPath.getParent().toFile();
@@ -34,6 +37,12 @@ class RemoteInput implements Input {
             }
 
             System.out.println("Requesting input file...");
+
+            if(!FIRST.get()) {
+                Thread.sleep(10_000L);
+            }
+
+            FIRST.set(false);
 
             try (var client = httpClient()) {
                 final var request = HttpRequest.newBuilder()
