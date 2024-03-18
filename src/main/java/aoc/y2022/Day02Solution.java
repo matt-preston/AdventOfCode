@@ -6,14 +6,14 @@ import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
 
-import static aoc.y2022.Day02Test.State.Paper;
-import static aoc.y2022.Day02Test.State.Rock;
-import static aoc.y2022.Day02Test.State.Scissors;
+import static aoc.y2022.Day02Solution.State.Paper;
+import static aoc.y2022.Day02Solution.State.Rock;
+import static aoc.y2022.Day02Solution.State.Scissors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 
-@AdventOfCode(year = 2022, day = 2)
-public class Day02Test {
+@AdventOfCode(year = 2022, day = 2, name = "Rock Paper Scissors")
+public class Day02Solution {
 
   enum State {
     Rock, Paper, Scissors;

@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 
 
-@AdventOfCode(year = 2022, day = 1)
-public class Day01Test {
+@AdventOfCode(year = 2022, day = 1, name = "Calorie Counting")
+public class Day01Solution {
 
   @Test
   public void part1() {

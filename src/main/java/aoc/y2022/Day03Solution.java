@@ -15,8 +15,8 @@ import static utils.Input.input;
 import static utils.Input.mockInput;
 
 
-@AdventOfCode(year = 2022, day = 3)
-public class Day03Test {
+@AdventOfCode(year = 2022, day = 3, name = "Rucksack Reorganization")
+public class Day03Solution {
 
   public static final String MOCK = """
       vJrwpWtwJgWrhcsFMMfFFhFp

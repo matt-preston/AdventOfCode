@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
 
-@AdventOfCode(year = 2022, day = 4)
-public class Day04Test {
+@AdventOfCode(year = 2022, day = 4, name = "Camp Cleanup")
+public class Day04Solution {
 
   public static final String MOCK = """
       2-4,6-8
