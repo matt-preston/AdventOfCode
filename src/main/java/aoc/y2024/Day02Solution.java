@@ -5,7 +5,6 @@ import utils.AdventOfCode;
 import utils.Input;
 import utils.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -23,6 +22,11 @@ public class Day02Solution {
             8 6 4 4 1
             1 3 6 7 9
             """;
+
+    interface Report {
+        int size();
+        long get(int index);
+    }
 
     @Test
     public void part1WithMockData() {
@@ -58,7 +62,27 @@ public class Day02Solution {
                 .count();
     }
 
-    private boolean safe(List<Long> report) {
+    private Report report(List<Long> levels, int skip) {
+        var size = skip < levels.size() ? levels.size() - 1 : levels.size();
+        return new Report() {
+            @Override
+            public int size() {
+                return size;
+            }
+
+            @Override
+            public long get(int index) {
+                return index < skip ? levels.get(index) : levels.get(index + 1);
+            }
+        };
+    }
+
+    private boolean safe(List<Long> levels) {
+        return safe(levels, Integer.MAX_VALUE);
+    }
+
+    private boolean safe(List<Long> levels, int skip) {
+        var report = report(levels, skip);
         for (int i = 1; i < report.size(); i++) {
             var diff  = report.get(i) - report.get(i - 1);
             if (Math.abs(diff) == 0 || Math.abs(diff) > 3) {
@@ -76,18 +100,13 @@ public class Day02Solution {
         return true;
     }
 
-    private boolean safeWithDampening(List<Long> report) {
-        if (safe(report)) {
+    private boolean safeWithDampening(List<Long> levels) {
+        if (safe(levels)) {
             return true;
         }
 
-        // would be more efficient to just skip i in safe() to avoid
-        // copying the list over and over
-        for (int i = 0; i < report.size(); i++) {
-            var copy = new ArrayList<>(report);
-            copy.remove(i);
-
-            if (safe(copy)) {
+        for (int skip = 0; skip < levels.size(); skip++) {
+            if (safe(levels, skip)) {
                 return true;
             }
         }
