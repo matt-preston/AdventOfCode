@@ -2,14 +2,13 @@ package aoc.y2024;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import utils.AdventOfCode;
-import org.junit.jupiter.api.Test;
 import utils.Input;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
