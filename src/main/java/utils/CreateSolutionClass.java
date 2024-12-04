@@ -44,7 +44,39 @@ public class CreateSolutionClass {
                 
                 @AdventOfCode(year = %d, day = %d, name = "")
                 public class Day%02dSolution {
+                    
+                    private static final String MOCK_1 = ""\"
+                                TODO
+                                ""\";
                 
+                        private static final String MOCK_2 = ""\"
+                                TODO
+                                ""\";
+                    
+                    @Test
+                    public void part1WithMockData() {
+                        assertEquals(0, todo(mockInput(MOCK_1)));
+                    }
+            
+                    @Test
+                    public void part1() {
+                        assertEquals(0, todo(input(this)));
+                    }
+            
+                    @Test
+                    public void part2WithMockData() {
+                        assertEquals(0, todo(mockInput(MOCK_2)));
+                    }
+            
+                    @Test
+                    public void part2() {
+                        assertEquals(0, todo(input(this)));
+                    }
+                    
+                    private int todo(Input input) {
+                        return 0;
+                    }
+                    
                 }
                 """;
 
