@@ -63,7 +63,7 @@ public class Day09Solution {
     private long sumOfPredictions(final Input input, Function<List<Long>, List<Long>> function) {
         var sum = 0L;
         for (final String line : input.lines()) {
-            final var originalNumber = Utils.parseNumbers(line);
+            final var originalNumber = Utils.parseLongs(line);
             final var transformedNumber = function.apply(originalNumber);
 
             sum += predictNextValue(transformedNumber);

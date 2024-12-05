@@ -213,8 +213,8 @@ public class Day22Solution {
         for (final String line : input.lines()) {
             var parts = line.split("~");
 
-            final var v1 = Utils.parseNumbers(parts[0], ",");
-            final var v2 = Utils.parseNumbers(parts[1], ",");
+            final var v1 = Utils.parseLongs(parts[0]);
+            final var v2 = Utils.parseLongs(parts[1]);
             result.add(new Brick(
                     String.valueOf(name++),
                     new Vector3(v1.get(0).intValue(), v1.get(1).intValue(), v1.get(2).intValue()),

@@ -4,13 +4,14 @@ import com.google.common.base.Preconditions;
 import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
+import utils.Utils;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
-import static utils.Utils.parseNumbers;
+import static utils.Utils.parseLongs;
 
 @AdventOfCode(year = 2023, day = 6, name = "Wait For It")
 public class Day06Solution {
@@ -46,8 +47,8 @@ public class Day06Solution {
     public long solutionForPart1(final Input input) {
         final var lines = input.linesArray();
 
-        final List<Long> times = parseNumbers(lines[0].substring(10));
-        final List<Long> distances = parseNumbers(lines[1].substring(10));
+        final List<Long> times = Utils.parseLongs(lines[0].substring(10));
+        final List<Long> distances = Utils.parseLongs(lines[1].substring(10));
 
         Preconditions.checkState(times.size() == distances.size());
 

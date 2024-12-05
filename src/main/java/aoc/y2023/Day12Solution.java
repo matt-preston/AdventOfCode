@@ -116,9 +116,9 @@ public class Day12Solution {
 
     private int[] sequence(final String input, int multiplier) {
         return IntStream.range(0, multiplier)
-                .mapToObj(i -> Utils.parseNumbers(input.split(" ")[1], ","))
+                .mapToObj(i -> Utils.parseInts(input.split(" ")[1]))
                 .flatMap(Collection::stream)
-                .mapToInt(Long::intValue)
+                .mapToInt(Integer::intValue)
                 .toArray();
     }
 }

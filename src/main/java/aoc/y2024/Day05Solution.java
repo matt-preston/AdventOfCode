@@ -1,21 +1,20 @@
 package aoc.y2024;
 
-import com.google.common.collect.*;
+import com.google.common.collect.HashMultimap;
 import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
+import utils.Utils;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import static com.google.common.collect.Comparators.isInOrder;
 import static com.google.common.collect.Ordering.from;
-import static com.google.common.collect.Sets.intersection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
+import static utils.Utils.parseInts;
 
 @AdventOfCode(year = 2024, day = 5, name = "Print Queue")
 public class Day05Solution {
@@ -91,10 +90,9 @@ public class Day05Solution {
     private Comparator<Integer> comparator(Input input) {
         var rules = HashMultimap.<Integer, Integer>create();
 
-        var text = input.text().split("\n\n")[0].trim();
-        for (String line : text.split("\n")) {
-            var bits = line.split("\\|", 2);
-            rules.put(Integer.parseInt(bits[0]), Integer.parseInt(bits[1]));
+        for (String line : input.section(0).lines()) {
+            final var ints = parseInts(line);
+            rules.put(ints.get(0), ints.get(1));
         }
 
         return (o1, o2) -> {
@@ -109,13 +107,8 @@ public class Day05Solution {
     }
 
     private List<List<Integer>> updates(Input input) {
-        var s = input.text().split("\n\n")[1].trim();
-        var result = Lists.<List<Integer>>newArrayList();
-
-        for (String line : s.split("\n")) {
-            result.add(Arrays.stream(line.trim().split(",")).map(Integer::parseInt).toList());
-        }
-
-        return result;
+        return input.section(1).lines().stream()
+                .map(Utils::parseInts)
+                .toList();
     }
 }

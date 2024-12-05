@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
+import utils.Utils;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +18,7 @@ import static java.util.stream.Collectors.toCollection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
-import static utils.Utils.parseNumbers;
+import static utils.Utils.parseLongs;
 
 @AdventOfCode(year = 2023, day = 5, name = "If You Give A Seed A Fertilizer")
 public class Day05Solution {
@@ -185,7 +186,7 @@ public class Day05Solution {
 
             final var lines = matcher.group(1).trim().split("\n");
             for (final String line : lines) {
-                final var numbers = parseNumbers(line);
+                final var numbers = Utils.parseLongs(line);
                 checkState(numbers.size() == 3);
                 result.add(new Range(numbers.get(1), numbers.get(0), numbers.get(2)));
             }
@@ -197,6 +198,6 @@ public class Day05Solution {
     private List<Long> seeds(final String input) {
         final var matcher = compile("seeds: ([\\d ]+)").matcher(input);
         checkState(matcher.find());
-        return parseNumbers(matcher.group(1));
+        return Utils.parseLongs(matcher.group(1));
     }
 }

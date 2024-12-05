@@ -50,14 +50,14 @@ public class Day02Solution {
 
     private long safeLevels(Input input) {
        return input.lines().stream()
-               .map(Utils::parseNumbers)
+               .map(Utils::parseLongs)
                .filter(this::safe)
                .count();
     }
 
     private long safeLevelsWithDampening(Input input) {
         return input.lines().stream()
-                .map(Utils::parseNumbers)
+                .map(Utils::parseLongs)
                 .filter(this::safeWithDampening)
                 .count();
     }

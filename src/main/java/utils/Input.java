@@ -1,11 +1,6 @@
 package utils;
 
-import java.io.IOException;
-import java.util.List;
-
-import com.google.common.io.CharSource;
-
-public interface Input {
+public interface Input extends Section {
 
     static Input mockInput(final String text) {
         return () -> text;
@@ -30,17 +25,8 @@ public interface Input {
         }
     }
 
-    String text();
-
-    default List<String> lines() {
-        try {
-            return CharSource.wrap(text()).readLines();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    default String[] linesArray() {
-        return lines().toArray(String[]::new);
+    default Section section(int index) {
+        var sections = text().split("\n\n");
+        return () -> sections[index].trim();
     }
 }
