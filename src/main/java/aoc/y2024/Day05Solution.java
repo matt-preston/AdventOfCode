@@ -6,8 +6,12 @@ import utils.AdventOfCode;
 import utils.Input;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import static com.google.common.collect.Comparators.isInOrder;
+import static com.google.common.collect.Ordering.from;
 import static com.google.common.collect.Sets.intersection;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
@@ -68,75 +72,40 @@ public class Day05Solution {
     }
 
     private int sumValidMiddlePages(Input input) {
-        var rules = rules(input);
-        var updates = updates(input);
-        var sum = 0;
-
-        for (List<Integer> update : updates) {
-            if(valid(rules, update)) {
-                sum += update.get((update.size() - 1) / 2);
-            }
-        }
-
-        return sum;
+        var comparator = comparator(input);
+        return updates(input).stream()
+                .filter(pages -> isInOrder(pages, comparator))
+                .mapToInt(pages -> pages.get((pages.size() - 1) / 2))
+                .sum();
     }
 
     private int sumCorrectedMiddlePages(Input input) {
-        var rules = rules(input);
-        var updates = updates(input);
-        var sum = 0;
-
-        for (List<Integer> update : updates) {
-            if(!valid(rules, update)) {
-                var inverted = Multimaps.invertFrom(rules, HashMultimap.create());
-
-                var copyOfUpdate = Sets.newLinkedHashSet(update);
-                var found = -1;
-
-                for (int i = 0; i < (update.size() + 1) / 2; i++) {
-                    var iterator = copyOfUpdate.iterator();
-                    while(iterator.hasNext()) {
-                        var page = iterator.next();
-                        if(intersection(inverted.get(page), copyOfUpdate).isEmpty()) {
-                            found = page;
-                            inverted.removeAll(page);
-                            inverted.values().remove(page);
-                            iterator.remove();
-                            break;
-                        }
-                    }
-                }
-                sum += found;
-            }
-        }
-
-        return sum;
+        var comparator = comparator(input);
+        return updates(input).stream()
+                .filter(pages -> !isInOrder(pages, comparator))
+                .map(pages -> from(comparator).sortedCopy(pages))
+                .mapToInt(pages -> pages.get((pages.size() - 1) / 2))
+                .sum();
     }
 
+    private Comparator<Integer> comparator(Input input) {
+        var rules = HashMultimap.<Integer, Integer>create();
 
-    private boolean valid(Multimap<Integer, Integer> rules, List<Integer> update) {
-        var seen = Sets.<Integer>newHashSet();
-        for (Integer page : update) {
-            for (Integer p : rules.get(page)) {
-                if (seen.contains(p)) {
-                    return false;
-                }
-            }
-            seen.add(page);
-        }
-        return true;
-    }
-
-    private Multimap<Integer, Integer> rules(Input input) {
-        var s = input.text().split("\n\n")[0].trim();
-        var result = HashMultimap.<Integer, Integer>create();
-
-        for (String line : s.split("\n")) {
+        var text = input.text().split("\n\n")[0].trim();
+        for (String line : text.split("\n")) {
             var bits = line.split("\\|", 2);
-            result.put(Integer.parseInt(bits[0]), Integer.parseInt(bits[1]));
+            rules.put(Integer.parseInt(bits[0]), Integer.parseInt(bits[1]));
         }
 
-        return result;
+        return (o1, o2) -> {
+            if (o1.equals(o2)) {
+                return 0;
+            } else if (rules.get(o1).contains(o2)) {
+                return -1;
+            } else {
+                return 1;
+            }
+        };
     }
 
     private List<List<Integer>> updates(Input input) {
