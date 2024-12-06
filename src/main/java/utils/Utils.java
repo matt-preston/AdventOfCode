@@ -21,6 +21,10 @@ public class Utils {
         return Arrays.stream(s.trim().split(sep)).map(Integer::parseInt).toList();
     }
 
+    public static char[][] matrix(final Input input) {
+        return matrix(input.text());
+    }
+
     public static char[][] matrix(final String string) {
         final var split = string.split("\n");
         var result = new char[split.length][split[0].length()];
