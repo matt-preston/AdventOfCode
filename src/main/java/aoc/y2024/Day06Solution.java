@@ -4,16 +4,18 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
+import utils.Direction;
 import utils.Input;
-import utils.Utils;
 import utils.Vector2;
 
 import java.util.Set;
 
-import static aoc.y2024.Day06Solution.Direction.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static utils.Direction.UP;
 import static utils.Input.input;
 import static utils.Input.mockInput;
+import static utils.Utils.find;
+import static utils.Utils.matrix;
 
 @AdventOfCode(year = 2024, day = 6, name = "Guard Gallivant")
 public class Day06Solution {
@@ -51,11 +53,9 @@ public class Day06Solution {
         assertEquals(1995, countLoops(input(this)));
     }
 
-    enum Direction { UP, RIGHT, DOWN, LEFT}
-
     private Set<Vector2> path(Input input) {
-        var matrix = Utils.matrix(input.text());
-        var position = findStart(matrix);
+        var matrix = matrix(input.text());
+        var position = find(matrix, '^');
         var dir = UP;
         var seen = Sets.newHashSet(position);
 
@@ -64,7 +64,7 @@ public class Day06Solution {
             if (next.x() < 0 || next.x() > matrix[0].length - 1 || next.y() < 0 || next.y() > matrix.length - 1) {
                 break; // found an exit
             } else if (matrix[next.y()][next.x()] == '#') {
-                dir = turnRight(dir);
+                dir = dir.turnRight();
             } else {
                 seen.add(next);
                 position = next;
@@ -75,8 +75,8 @@ public class Day06Solution {
     }
 
     private int countLoops(Input input) {
-        var matrix = Utils.matrix(input);
-        var start = findStart(matrix);
+        var matrix = matrix(input);
+        var start = find(matrix, '^');
         var count = 0;
 
         for (Vector2 position : path(input)) {
@@ -104,7 +104,7 @@ public class Day06Solution {
             if (next.x() < 0 || next.x() > matrix[0].length - 1 || next.y() < 0 || next.y() > matrix.length - 1) {
                 return false;
             } else if (matrix[next.y()][next.x()] == '#') {
-                dir = turnRight(dir);
+                dir = dir.turnRight();
             } else if (seen.containsEntry(next, dir)) {
                 return true;
             } else {
@@ -114,15 +114,6 @@ public class Day06Solution {
         }
     }
 
-    private Direction turnRight(Direction dir) {
-        return switch (dir) {
-            case UP -> RIGHT;
-            case RIGHT -> DOWN;
-            case DOWN -> LEFT;
-            case LEFT -> UP;
-        };
-    }
-
     private Vector2 walk(Vector2 position, Direction d) {
         return switch (d) {
             case UP -> new Vector2(position.x(), position.y() - 1);
@@ -130,16 +121,5 @@ public class Day06Solution {
             case RIGHT -> new Vector2(position.x() + 1, position.y());
             case LEFT -> new Vector2(position.x() - 1, position.y());
         };
-    }
-
-    private Vector2 findStart(char[][] matrix) {
-        for (int y = 0; y < matrix.length; y++) {
-            for (int x = 0; x < matrix[y].length; x++) {
-                if (matrix[y][x] == '^') {
-                    return new Vector2(x, y);
-                }
-            }
-        }
-        throw new IllegalStateException();
     }
 }

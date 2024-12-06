@@ -21,6 +21,17 @@ public class Utils {
         return Arrays.stream(s.trim().split(sep)).map(Integer::parseInt).toList();
     }
 
+    public static Vector2 find(char[][] matrix, char target) {
+        for (int y = 0; y < matrix.length; y++) {
+            for (int x = 0; x < matrix[y].length; x++) {
+                if (matrix[y][x] == target) {
+                    return new Vector2(x, y);
+                }
+            }
+        }
+        return null;
+    }
+
     public static char[][] matrix(final Input input) {
         return matrix(input.text());
     }
