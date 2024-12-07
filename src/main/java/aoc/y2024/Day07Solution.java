@@ -1,15 +1,14 @@
 package aoc.y2024;
 
-import com.google.common.collect.*;
-import utils.AdventOfCode;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
+import utils.AdventOfCode;
 import utils.Input;
 import utils.Utils;
 
-import java.util.*;
+import java.util.List;
 
-import static com.google.common.collect.Sets.cartesianProduct;
-import static java.util.Collections.nCopies;
+import static java.lang.Long.parseLong;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
@@ -31,54 +30,51 @@ public class Day07Solution {
 
     @Test
     public void part1WithMockData() {
-        assertEquals(3749, sumValidEquations(mockInput(MOCK), Set.of("+", "*")));
+        assertEquals(3749, sumValidEquations(mockInput(MOCK), false));
     }
 
     @Test
     public void part1() {
-        assertEquals(3312271365652L, sumValidEquations(input(this), Set.of("+", "*")));
+        assertEquals(3312271365652L, sumValidEquations(input(this), false));
     }
 
     @Test
     public void part2WithMockData() {
-        assertEquals(11387, sumValidEquations(mockInput(MOCK), Set.of("+", "*", "||")));
+        assertEquals(11387, sumValidEquations(mockInput(MOCK), true));
     }
 
     @Test
     public void part2() {
-        assertEquals(509463489296712L, sumValidEquations(input(this), Set.of("+", "*", "||")));
+        assertEquals(509463489296712L, sumValidEquations(input(this), true));
     }
 
     record Equation(long result, List<Long> values) {
     }
 
-    private long sumValidEquations(Input input, Set<String> valid) {
+    private long sumValidEquations(Input input, boolean pt2) {
         var sum = 0L;
-
         for (Equation equation : parse(input)) {
-            for (List<String> operators : cartesianProduct(nCopies(equation.values().size() - 1, valid))) {
-                var tmp = equation.values().getFirst();
-
-                for (int i = 1; i < equation.values().size(); i++) {
-                    var right = equation.values().get(i);
-                    var op = operators.get(i - 1);
-
-                    tmp = switch (op) {
-                        case "+" -> tmp + right;
-                        case "*" -> tmp * right;
-                        case "||" -> Long.valueOf(tmp + Long.toString(right));
-                        default -> throw new IllegalStateException();
-                    };
-                }
-
-                if (tmp == equation.result) {
-                    sum += equation.result;
-                    break;
-                }
+            if (valid(equation, equation.values().getFirst(), skipFirst(equation.values()), pt2)) {
+                sum += equation.result();
             }
         }
-
         return sum;
+    }
+
+    private boolean valid(Equation equation, long left, List<Long> remaining, boolean pt2) {
+        if (remaining.isEmpty()) {
+            return left == equation.result();
+        }
+
+        var right = remaining.getFirst();
+
+        return valid(equation, left + right, skipFirst(remaining), pt2)
+                || valid(equation, left * right, skipFirst(remaining), pt2)
+                || (pt2 && valid(equation, parseLong(left + Long.toString(right)), skipFirst(remaining), pt2));
+    }
+
+    private List<Long> skipFirst(List<Long> list) {
+        return list.subList(1, list.size());
     }
 
     private List<Equation> parse(Input input) {
