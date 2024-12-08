@@ -3,10 +3,7 @@ package aoc.y2024;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
-import utils.AdventOfCode;
-import utils.Direction;
-import utils.Input;
-import utils.Vector2;
+import utils.*;
 
 import java.util.Set;
 
@@ -14,8 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Direction.UP;
 import static utils.Input.input;
 import static utils.Input.mockInput;
-import static utils.Utils.find;
-import static utils.Utils.matrix;
+import static utils.Utils.*;
 
 @AdventOfCode(year = 2024, day = 6, name = "Guard Gallivant")
 public class Day06Solution {
@@ -61,7 +57,7 @@ public class Day06Solution {
 
         while(true) {
             var next = walk(position, dir);
-            if (next.x() < 0 || next.x() > matrix[0].length - 1 || next.y() < 0 || next.y() > matrix.length - 1) {
+            if (!contains(matrix, next)) {
                 break; // found an exit
             } else if (matrix[next.y()][next.x()] == '#') {
                 dir = dir.turnRight();
