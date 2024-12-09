@@ -65,7 +65,7 @@ class RemoteInput implements Input {
     @Override
     public String text() {
         try {
-            return readString(inputPath, UTF_8);
+            return readString(inputPath, UTF_8).trim();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
