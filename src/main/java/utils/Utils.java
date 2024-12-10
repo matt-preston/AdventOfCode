@@ -40,6 +40,10 @@ public class Utils {
         return v.y() >= 0 && v.y() < matrix.length && v.x() >= 0 && v.x() < matrix[0].length;
     }
 
+    public static char get(char[][] matrix, Vector2 v) {
+        return matrix[v.y()][v.x()];
+    }
+
     public static char[][] matrix(final String string) {
         final var split = string.split("\n");
         var result = new char[split.length][split[0].length()];
