@@ -1,16 +1,17 @@
 package aoc.y2024;
 
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multiset;
 import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
 import utils.Utils;
 import utils.Vector2;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
@@ -32,32 +33,32 @@ public class Day10Solution {
 
     @Test
     public void part1WithMockData() {
-        assertEquals(36, sum(mockInput(MOCK), s -> s.elementSet().size()));
+        assertEquals(36, sum(mockInput(MOCK), HashSet::new));
     }
 
     @Test
     public void part1() {
-        assertEquals(472, sum(input(this), s -> s.elementSet().size()));
+        assertEquals(472, sum(input(this), HashSet::new));
     }
 
     @Test
     public void part2WithMockData() {
-        assertEquals(81, sum(mockInput(MOCK), Multiset::size));
+        assertEquals(81, sum(mockInput(MOCK), ArrayList::new));
     }
 
     @Test
     public void part2() {
-        assertEquals(969, sum(input(this), Multiset::size));
+        assertEquals(969, sum(input(this), ArrayList::new));
     }
 
-    private int sum(Input input, Function<Multiset<?>, Integer> function) {
+    private int sum(Input input, Supplier<Collection<Vector2>> factory) {
         char[][] matrix = Utils.matrix(input);
 
         var sum = 0;
         for (int y = 0; y < matrix.length; y++) {
             for (int x = 0; x < matrix[0].length; x++) {
                 if (matrix[y][x] == '0') {
-                    sum += function.apply(paths(matrix, new Vector2(x, y)));
+                    sum += paths(matrix, new Vector2(x, y), factory).size();
                 }
             }
         }
@@ -65,11 +66,11 @@ public class Day10Solution {
         return sum;
     }
 
-    private Multiset<Vector2> paths(char[][] matrix, Vector2 start) {
+    private Collection<Vector2> paths(char[][] matrix, Vector2 start, Supplier<Collection<Vector2>> factory) {
         var frontier = Lists.<Vector2>newLinkedList();
         frontier.add(start);
 
-        var result = HashMultiset.<Vector2>create();
+        var result = factory.get();
 
         while (!frontier.isEmpty()) {
             final var current = frontier.poll();
