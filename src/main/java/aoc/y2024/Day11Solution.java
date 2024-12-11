@@ -1,12 +1,12 @@
 package aoc.y2024;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.junit.jupiter.api.Test;
 import utils.AdventOfCode;
 import utils.Input;
 import utils.Utils;
 
-import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
@@ -19,65 +19,56 @@ public class Day11Solution {
 
     @Test
     public void part1WithMockData() {
-        assertEquals(55312, stones(mockInput(MOCK), 25));
+        assertEquals(55312, sumOfStones(mockInput(MOCK), 25));
     }
 
     @Test
     public void part1() {
-        assertEquals(182081, stones(input(this), 25));
+        assertEquals(182081, sumOfStones(input(this), 25));
     }
 
     @Test
     public void part2() {
-        var prev = 0;
-        for (int i = 0; i <= 30; i++) {
-            var result = stones(input(this), i);
-            System.out.printf("%d => %d (diff=%d))%n", i, result, result - prev);
-            prev = result;
-        }
-
-        System.out.println(predict(10));
+        assertEquals(216318908621637L, sumOfStones(input(this), 75));
     }
 
-    private int predict(int times) {
-        var a = 1;
-        var b = 1.2;
-        var c = 8.2;
-
-        return (int) ((a * (int) Math.pow(times, 2)) + (b * times) + c);
+    private long sumOfStones(Input input, int times) {
+        return Utils.parseLongs(input.text()).stream()
+                .mapToLong(stone -> blink(stone, times))
+                .sum();
     }
 
-    private int stones(Input input, int times) {
-        List<Long> stones = Utils.parseLongs(input.text());
-
-        for (int i = 0; i < times; i++) {
-            stones = rearrange(stones);
-        }
-
-        return stones.size();
+    record Key(long stone, int depth) {
     }
 
-    private List<Long> rearrange(List<Long> stones) {
-        var result = Lists.<Long>newLinkedList();
+    private static Map<Key, Long> CACHE = Maps.newHashMap();
 
-        for (Long stone : stones) {
-            if (stone == 0) {
-                result.add(1L);
-            } else if (((int) (Math.log10(stone)) + 1) % 2 == 0) {  // even digits
-                int len = (int) (Math.log10(stone) + 1);
-
-                var first = (long) (stone / Math.pow(10, len / 2));
-                var second = (long) (stone - (first * Math.pow(10, len / 2)));
-
-                result.add(first);
-                result.add(second);
-            } else {
-                result.add(stone * 2024L);
-            }
+    private long blink(long stone, int depth) {
+        var key = new Key(stone, depth);
+        var result = CACHE.get(key);
+        if (result == null) {
+            result = blinkImpl(stone, depth);
+            CACHE.put(key, result);
         }
-
         return result;
     }
 
+    private long blinkImpl(long stone, int depth) {
+        if (depth == 0) {
+            return 1;
+        }
 
+        if (stone == 0) {
+            return blink(1, depth - 1);
+        } else if (((int) (Math.log10(stone)) + 1) % 2 == 0) {  // even digits
+            int len = (int) (Math.log10(stone) + 1);
+
+            var first = (long) (stone / Math.pow(10, len / 2));
+            var second = (long) (stone - (first * Math.pow(10, len / 2)));
+
+            return blink(first, depth - 1) + blink(second, depth - 1);
+        } else {
+            return blink(stone * 2024L, depth - 1);
+        }
+    }
 }
