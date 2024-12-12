@@ -32,43 +32,43 @@ public class Day11Solution {
         assertEquals(216318908621637L, sumOfStones(input(this), 75));
     }
 
-    private long sumOfStones(Input input, int times) {
+    private long sumOfStones(Input input, int blinks) {
         return Utils.parseLongs(input.text()).stream()
-                .mapToLong(stone -> blink(stone, times))
+                .mapToLong(stone -> numberOfStones(stone, blinks))
                 .sum();
     }
 
-    record Key(long stone, int depth) {
+    record Key(long stone, int blinks) {
     }
 
-    private static Map<Key, Long> CACHE = Maps.newHashMap();
+    private final static Map<Key, Long> CACHE = Maps.newHashMap();
 
-    private long blink(long stone, int depth) {
-        var key = new Key(stone, depth);
+    private long numberOfStones(long value, int numBlinks) {
+        var key = new Key(value, numBlinks);
         var result = CACHE.get(key);
         if (result == null) {
-            result = blinkImpl(stone, depth);
+            result = numberOfStonesImpl(value, numBlinks);
             CACHE.put(key, result);
         }
         return result;
     }
 
-    private long blinkImpl(long stone, int depth) {
-        if (depth == 0) {
+    private long numberOfStonesImpl(long value, int numBlinks) {
+        if (numBlinks == 0) {
             return 1;
         }
 
-        if (stone == 0) {
-            return blink(1, depth - 1);
-        } else if (((int) (Math.log10(stone)) + 1) % 2 == 0) {  // even digits
-            int len = (int) (Math.log10(stone) + 1);
+        if (value == 0) {
+            return numberOfStones(1, numBlinks - 1);
+        } else if (((int) (Math.log10(value)) + 1) % 2 == 0) {  // even digits
+            int len = (int) (Math.log10(value) + 1);
 
-            var first = (long) (stone / Math.pow(10, len / 2));
-            var second = (long) (stone - (first * Math.pow(10, len / 2)));
+            var first = (long) (value / Math.pow(10, len / 2));
+            var second = (long) (value - (first * Math.pow(10, len / 2)));
 
-            return blink(first, depth - 1) + blink(second, depth - 1);
+            return numberOfStones(first, numBlinks - 1) + numberOfStones(second, numBlinks - 1);
         } else {
-            return blink(stone * 2024L, depth - 1);
+            return numberOfStones(value * 2024L, numBlinks - 1);
         }
     }
 }
