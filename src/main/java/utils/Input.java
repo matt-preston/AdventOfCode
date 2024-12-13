@@ -1,5 +1,8 @@
 package utils;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 public interface Input extends Section {
 
     static Input mockInput(final String text) {
@@ -23,6 +26,12 @@ public interface Input extends Section {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    default Collection<Section> sections() {
+        return Arrays.stream(text().split("\n\n"))
+                .map(s -> (Section) s::trim)
+                .toList();
     }
 
     default Section section(int index) {
