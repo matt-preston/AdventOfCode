@@ -63,6 +63,26 @@ public class Utils {
         return result;
     }
 
+    public static char[][] mirrorVertically(final char[][] matrix) {
+        for(int i = 0; i < matrix.length / 2; i++) {
+            var temp = matrix[i];
+            matrix[i] = matrix[matrix.length - i - 1];
+            matrix[matrix.length - i - 1] = temp;
+        }
+        return matrix;
+    }
+
+    public static char[][] mirrorHorizontally(final char[][] matrix) {
+        for (char[] chars : matrix) {
+            for(int i = 0; i < chars.length / 2; i++) {
+                var temp = chars[i];
+                chars[i] = chars[chars.length - i - 1];
+                chars[chars.length - i - 1] = temp;
+            }
+        }
+        return matrix;
+    }
+
     public static char[][] copy(final char[][] matrix) {
         final var result = new char[matrix.length][matrix[0].length];
         for (int i = 0; i < matrix.length; i++) {
@@ -80,5 +100,11 @@ public class Utils {
             return 0;
         }
         return (nth * (nth + 1)) / 2;
+    }
+
+    public static void debug(char[][] matrix) {
+        for (char[] line : matrix) {
+            System.out.println(line);
+        }
     }
 }
