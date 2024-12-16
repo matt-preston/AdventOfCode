@@ -12,7 +12,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
 import static utils.Input.mockInput;
-import static utils.Utils.*;
+import static utils.Utils.find;
+import static utils.Utils.mirrorVertically;
 
 @AdventOfCode(year = 2024, day = 15, name = "Warehouse Woes")
 public class Day15Solution {
@@ -83,32 +84,33 @@ public class Day15Solution {
         var matrix = Utils.matrix(input.section(0).text());
 
         for (char c : input.section(1).text().replaceAll("[\r\n]", "").toCharArray()) {
-            matrix = switch (c) {
-                case '<' -> mirrorHorizontally(moveRobotEast(mirrorHorizontally(matrix)));
-                case '>' -> moveRobotEast(matrix);
-                case '^' -> rotateCW(rotateCW(rotateCW(moveRobotEast(rotateCW(matrix)))));
-                case 'v' -> rotateCW(moveRobotEast(rotateCW(rotateCW(rotateCW(matrix)))));
+            var vector = switch (c) {
+                case '<' -> new Vector2(-1, 0);
+                case '>' -> new Vector2(1, 0);
+                case '^' -> new Vector2(0, -1);
+                case 'v' -> new Vector2(0, 1);
                 default -> throw new IllegalStateException("[" + c + "]");
             };
+            moveIfPossible(matrix, find(matrix, '@'), vector);
         }
 
         return score(matrix);
     }
 
     private int sumOfBoxPositions2(Input input) {
-        var matrix = Utils.matrix(expandMap(input.section(0).text()));
+        var map = Utils.matrix(expandMap(input.section(0).text()));
 
         for (char c : input.section(1).text().replaceAll("[\r\n]", "").toCharArray()) {
-            matrix = switch (c) {
-                case '<' -> mirrorHorizontally(moveRobotEast(mirrorHorizontally(matrix)));
-                case '>' -> moveRobotEast(matrix);
-                case '^' -> mirrorVertically(moveRobotSouth(mirrorVertically(matrix)));
-                case 'v' -> moveRobotSouth(matrix);
+            switch (c) {
+                case '<' -> moveIfPossible(map, find(map, '@'), new Vector2(-1, 0));
+                case '>' -> moveIfPossible(map, find(map, '@'), new Vector2(1, 0));
+                case '^' -> mirrorVertically(moveRobotSouth(mirrorVertically(map)));
+                case 'v' -> moveRobotSouth(map);
                 default -> throw new IllegalStateException("[" + c + "]");
             };
         }
 
-        return score(matrix);
+        return score(map);
     }
 
     private int score(char[][] map) {
@@ -150,16 +152,20 @@ public class Day15Solution {
                 .replaceAll("@", "@.");
     }
 
-    private char[][] moveRobotEast(char[][] map) {
-        var robot = Utils.find(map, '@');
-        var freeSpace = findNextFreeSpace(map, robot, new Vector2(1, 0));
-        if (freeSpace != null) {
-            for (int x = freeSpace.x(); x > robot.x(); x--) {
-                map[robot.y()][x] = map[robot.y()][x - 1];
-            }
-            map[robot.y()][robot.x()] = '.';
+    private boolean moveIfPossible(char[][] map, Vector2 position, Vector2 vector) {
+        var next = position.add(vector);
+
+        if (Utils.get(map, position) == '.') {
+            return true;
+        } else if (Utils.get(map, position) == '#') {
+            return false;
+        } else if (moveIfPossible(map, next, vector)) {
+            var temp = map[next.y()][next.x()];
+            map[next.y()][next.x()] = map[position.y()][position.x()];
+            map[position.y()][position.x()] = temp;
+            return true;
         }
-        return map;
+        return false;
     }
 
     private void shuffleSouth(char[][] map, Vector2 start) {
