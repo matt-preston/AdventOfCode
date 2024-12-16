@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -103,8 +104,12 @@ public class Utils {
     }
 
     public static void debug(char[][] matrix) {
+        debug(matrix, System.out);
+    }
+
+    public static void debug(char[][] matrix, PrintStream ps) {
         for (char[] line : matrix) {
-            System.out.println(line);
+            ps.println(line);
         }
     }
 }

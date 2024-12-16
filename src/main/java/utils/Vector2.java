@@ -1,6 +1,6 @@
 package utils;
 
-public record Vector2(int x, int y) {
+public record Vector2(int x, int y) implements Comparable<Vector2> {
 
     public Vector2 translate(final Vector2 other) {
         return add(other);
@@ -39,5 +39,15 @@ public record Vector2(int x, int y) {
     @Override
     public String toString() {
         return x + "," + y;
+    }
+
+
+    @Override
+    public int compareTo(Vector2 o) {
+        var result = Integer.compare(x, o.x);
+        if (result == 0) {
+            return Integer.compare(y, o.y);
+        }
+        return result;
     }
 }
