@@ -25,11 +25,10 @@ class RemoteInput implements Input {
 
     private static AtomicBoolean FIRST = new AtomicBoolean(true);
 
-    private final Path inputPath;
+    private final String text;
 
     RemoteInput(int year, int day) throws Exception {
-        inputPath = Paths.get(format("input/%d/%02d-input", year, day));
-
+        var inputPath = Paths.get(format("input/%d/%02d-input", year, day));
         if (!inputPath.toFile().exists()) {
             var parent = inputPath.getParent().toFile();
             if (!parent.exists()) {
@@ -60,15 +59,12 @@ class RemoteInput implements Input {
                 }
             }
         }
+        text = readString(inputPath, UTF_8).trim();
     }
 
     @Override
     public String text() {
-        try {
-            return readString(inputPath, UTF_8).trim();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return text;
     }
 
     private String cookieHash() throws IOException {
