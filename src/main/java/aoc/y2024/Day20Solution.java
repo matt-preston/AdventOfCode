@@ -1,6 +1,5 @@
 package aoc.y2024;
 
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -12,7 +11,6 @@ import utils.Vector2;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
@@ -106,7 +104,7 @@ public class Day20Solution {
 
             for (Vector2 next : new Vector2[]{current.position().north(), current.position().south(), current.position().east(), current.position().west()}) {
                 if (next.x() > 0 && next.x() < map[0].length - 1 && next.y() > 0 && next.y() < map.length - 1) {
-                    if(seen.add(next)) {
+                    if (seen.add(next)) {
                         int len = current.cheatLength() + 1;
 
                         if (len > 1 && Utils.get(map, next) != '#') {
