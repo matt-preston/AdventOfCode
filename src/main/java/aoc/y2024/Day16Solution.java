@@ -10,7 +10,7 @@ import java.util.PriorityQueue;
 
 import static java.util.Comparator.comparingInt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static utils.Direction.RIGHT;
+import static utils.Direction.EAST;
 import static utils.Input.input;
 import static utils.Input.mockInput;
 
@@ -90,13 +90,7 @@ public class Day16Solution {
 
     record State(Vector2 position, Direction direction, int cost) implements Comparable<State> {
         State moveForward() {
-            var nextPosition = switch (direction) {
-                case UP -> position.north();
-                case RIGHT -> position.east();
-                case DOWN -> position.south();
-                case LEFT -> position.west();
-            };
-            return new State(nextPosition, direction, cost + 1);
+            return new State(position.move(direction), direction, cost + 1);
         }
 
         State turnRight() {
@@ -128,10 +122,10 @@ public class Day16Solution {
         var target = new Vector2(map[0].length - 2, 1);
 
         var frontier = new PriorityQueue<State>();
-        frontier.add(new State(start, RIGHT, 0));
+        frontier.add(new State(start, EAST, 0));
 
         var costs = Maps.<Position, Integer>newHashMap();
-        costs.put(new Position(start, RIGHT), 0);
+        costs.put(new Position(start, EAST), 0);
 
         while (!frontier.isEmpty()) {
             final var current = frontier.poll();
@@ -166,13 +160,13 @@ public class Day16Solution {
         var target = new Vector2(map[0].length - 2, 1);
 
         var frontier = new PriorityQueue<State>();
-        frontier.add(new State(start, RIGHT, 0));
+        frontier.add(new State(start, EAST, 0));
 
         var costs = Maps.<Position, Integer>newHashMap();
-        costs.put(new Position(start, RIGHT), 0);
+        costs.put(new Position(start, EAST), 0);
 
         var positionsVisited = HashMultimap.<Position, Vector2>create();
-        positionsVisited.put(new Position(start, RIGHT), start);
+        positionsVisited.put(new Position(start, EAST), start);
 
         while (!frontier.isEmpty()) {
             final var current = frontier.poll();

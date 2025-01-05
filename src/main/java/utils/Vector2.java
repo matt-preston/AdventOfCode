@@ -18,6 +18,16 @@ public record Vector2(int x, int y) implements Comparable<Vector2> {
         return new Vector2(x - other.x, y - other.y);
     }
 
+
+    public Vector2 move(Direction direction) {
+        return switch (direction) {
+            case NORTH -> north();
+            case SOUTH -> south();
+            case EAST -> east();
+            case WEST -> west();
+        };
+    }
+
     // Assumes the origin is top-left, for working with a 2D array (matrix)
     public Vector2 north() {
         return add(0, -1);

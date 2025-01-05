@@ -3,12 +3,16 @@ package aoc.y2024;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
-import utils.*;
+import utils.AdventOfCode;
+import utils.Input;
+import utils.Utils;
+import utils.Vector2;
 
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static utils.Direction.UP;
+import static utils.Direction.NORTH;
 import static utils.Input.input;
 import static utils.Input.mockInput;
 import static utils.Utils.*;
@@ -51,12 +55,12 @@ public class Day06Solution {
 
     private Set<Vector2> path(Input input) {
         var matrix = matrix(input.text());
-        var position = find(matrix, '^');
-        var dir = UP;
+        var position = checkNotNull(find(matrix, '^'));
+        var dir = NORTH;
         var seen = Sets.newHashSet(position);
 
-        while(true) {
-            var next = walk(position, dir);
+        while (true) {
+            var next = position.move(dir);
             if (!contains(matrix, next)) {
                 break; // found an exit
             } else if (matrix[next.y()][next.x()] == '#') {
@@ -91,15 +95,15 @@ public class Day06Solution {
 
     private boolean loop(char[][] matrix, Vector2 start) {
         var position = start;
-        var dir = UP;
+        var dir = NORTH;
         var seen = HashMultimap.create();
         seen.put(position, dir);
 
-        while(true) {
-            var next = walk(position, dir);
-            if (next.x() < 0 || next.x() > matrix[0].length - 1 || next.y() < 0 || next.y() > matrix.length - 1) {
+        while (true) {
+            var next = position.move(dir);
+            if (!Utils.contains(matrix, next)) {
                 return false;
-            } else if (matrix[next.y()][next.x()] == '#') {
+            } else if (Utils.get(matrix, next) == '#') {
                 dir = dir.turnRight();
             } else if (seen.containsEntry(next, dir)) {
                 return true;
@@ -108,14 +112,5 @@ public class Day06Solution {
                 position = next;
             }
         }
-    }
-
-    private Vector2 walk(Vector2 position, Direction d) {
-        return switch (d) {
-            case UP -> new Vector2(position.x(), position.y() - 1);
-            case DOWN -> new Vector2(position.x(), position.y() + 1);
-            case RIGHT -> new Vector2(position.x() + 1, position.y());
-            case LEFT -> new Vector2(position.x() - 1, position.y());
-        };
     }
 }

@@ -1,23 +1,23 @@
 package utils;
 
 public enum Direction {
-    UP, RIGHT, DOWN, LEFT;
+    NORTH, SOUTH, EAST, WEST;
 
     public Direction turnRight() {
         return switch (this) {
-            case UP -> RIGHT;
-            case RIGHT -> DOWN;
-            case DOWN -> LEFT;
-            case LEFT -> UP;
+            case NORTH -> EAST;
+            case EAST -> SOUTH;
+            case SOUTH -> WEST;
+            case WEST -> NORTH;
         };
     }
 
     public Direction turnLeft() {
         return switch (this) {
-            case UP -> LEFT;
-            case LEFT -> DOWN;
-            case DOWN -> RIGHT;
-            case RIGHT -> UP;
+            case NORTH -> WEST;
+            case WEST -> SOUTH;
+            case SOUTH -> EAST;
+            case EAST -> NORTH;
         };
     }
 }
