@@ -1,7 +1,7 @@
 package utils;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 public interface Input extends Section {
 
@@ -28,14 +28,13 @@ public interface Input extends Section {
         }
     }
 
-    default Collection<Section> sections() {
+    default List<Section> sections() {
         return Arrays.stream(text().split("\n\n"))
-                .map(s -> (Section) s::trim)
+                .map(s -> (Section) s::stripTrailing)
                 .toList();
     }
 
     default Section section(int index) {
-        var sections = text().split("\n\n");
-        return () -> sections[index].trim();
+        return sections().get(index);
     }
 }

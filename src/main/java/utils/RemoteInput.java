@@ -8,7 +8,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -23,7 +22,7 @@ import static java.nio.file.Files.writeString;
 
 class RemoteInput implements Input {
 
-    private static AtomicBoolean FIRST = new AtomicBoolean(true);
+    private static final AtomicBoolean FIRST = new AtomicBoolean(true);
 
     private final String text;
 
@@ -37,7 +36,7 @@ class RemoteInput implements Input {
 
             System.out.println("Requesting input file...");
 
-            if(!FIRST.get()) {
+            if (!FIRST.get()) {
                 Thread.sleep(10_000L);
             }
 
@@ -59,7 +58,7 @@ class RemoteInput implements Input {
                 }
             }
         }
-        text = readString(inputPath, UTF_8).trim();
+        text = readString(inputPath, UTF_8).stripTrailing();
     }
 
     @Override
