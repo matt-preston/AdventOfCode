@@ -51,7 +51,7 @@ public class Day09Solution {
 
     @Test
     public void part2() {
-        assertEquals(0, encryptionWeakness(input(this), 507622668));
+        assertEquals(76688505, encryptionWeakness(input(this), 507622668));
     }
 
     private int solve(Input input, int preamble) {
