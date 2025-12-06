@@ -58,7 +58,7 @@ class RemoteInput implements Input {
                 }
             }
         }
-        text = readString(inputPath, UTF_8).stripTrailing();
+        text = readString(inputPath, UTF_8);
     }
 
     @Override

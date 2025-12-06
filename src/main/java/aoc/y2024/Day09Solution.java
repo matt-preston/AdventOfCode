@@ -43,7 +43,7 @@ public class Day09Solution {
     }
 
     private long checksum(Input input) {
-        var blocks = rearrange(blocks(input.text()));
+        var blocks = rearrange(blocks(input.text().trim()));
 
         var sum = 0L;
         char[] charArray = blocks.toCharArray();
@@ -56,13 +56,13 @@ public class Day09Solution {
     }
 
     private long checksum2(Input input) {
-        var blocks = rearrange(blocks2(input.text()));
+        var blocks = rearrange(blocks2(input.text().trim()));
 
         var sum = 0L;
         for (Entry<Integer, Block> entry : blocks.entrySet()) {
             var block = entry.getValue();
             for (int i = 0; i < block.length(); i++) {
-                sum += (long) (entry.getKey() + i) * block.id();;
+                sum += (long) (entry.getKey() + i) * block.id();
             }
         }
         return sum;
@@ -158,8 +158,7 @@ public class Day09Solution {
         var result = Maps.<Integer, Block>newTreeMap();
 
         char[] charArray = text.toCharArray();
-        for (int i = 0; i < charArray.length; i++) {
-            var c = charArray[i];
+        for (char c : charArray) {
             var length = Integer.parseInt("" + c);
             if (freeSpace) {
                 result.put(offset, new Block(null, length));
