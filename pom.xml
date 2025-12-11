@@ -56,6 +56,11 @@
       <artifactId>junit-jupiter-api</artifactId>
       <version>5.10.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.ortools</groupId>
+      <artifactId>ortools-java</artifactId>
+      <version>9.11.4210</version>
+    </dependency>
   </dependencies>
 
   <build>
