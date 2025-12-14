@@ -1,17 +1,13 @@
 package aoc.y2025;
 
-import aoc.y2023.Day19Solution;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import utils.AdventOfCode;
 import org.junit.jupiter.api.Test;
+import utils.AdventOfCode;
 import utils.Input;
 
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static utils.Input.input;
@@ -64,76 +60,57 @@ public class Day11Solution {
         assertEquals(2, solve2(mockInput(MOCK2)));
     }
 
-    // 763_969_370_767_434 too high
     @Test
     public void part2() {
-        assertEquals(0L, solve2(input(this)));
+        assertEquals(509312913844956L, solve2(input(this)));
     }
 
-    private int solve(Input input) {
+    private long solve(Input input) {
         var graph = graph(input);
 
         var cameFrom = bfs(graph, "you");
 
-        return simpleCountPaths(cameFrom, "out", "you");
+        return countPaths(cameFrom, "out", "you");
     }
 
-    // 382_196_088_773_040_186 unique paths
     private long solve2(Input input) {
         var graph = graph(input);
 
-        var cameFrom = bfs(graph, "svr");
+        var cameFromSvr = bfs(graph, "svr");
+        var cameFromDac = bfs(graph, "dac");
+        var cameFromFft = bfs(graph, "fft");
 
-        return countPaths(cameFrom, "out", "svr", Set.of("out"));
+        var r1 = countPaths(cameFromSvr, "dac", "svr") *
+                 countPaths(cameFromDac, "fft", "dac") *
+                 countPaths(cameFromFft, "out", "fft");
+
+        var r2 = countPaths(cameFromSvr, "fft", "svr") *
+                 countPaths(cameFromFft, "dac", "fft") *
+                 countPaths(cameFromDac, "out", "dac");
+
+        return r1 + r2;
     }
 
-    private final Map<Key, Long> cache = Maps.newHashMap();
+    private final Map<String, Long> cache = Maps.newHashMap();
 
-    record Key(String from, String target, Set<String> path){}
-
-    private long countPaths(HashMultimap<String, String> cameFrom, String from, String target, Set<String> path) {
-//        var key = from + "->" + target + ":" + path;
-        var key = new Key(from, target, path);
+    private long countPaths(HashMultimap<String, String> cameFrom, String from, String target) {
+        var key = from + "->" + target;
         if (cache.containsKey(key)) {
             return cache.get(key);
         } else {
-            var value = countPathsImpl(cameFrom, from, target, path);
+            var value = countPathsImpl(cameFrom, from, target);
             cache.put(key, value);
             return value;
         }
     }
 
-    private long countPathsImpl(HashMultimap<String, String> cameFrom, String from, String target, Set<String> path) {
+    private long countPathsImpl(HashMultimap<String, String> cameFrom, String from, String target) {
         var count = 0L;
-        for (String to : cameFrom.get(from)) {
-//            if (to.equals("dac")) dac = true;
-//            if (to.equals("fft")) fft = true;
-
-            if (to.equals(target)) {
-                if (path.contains("dac") && path.contains("fft")) {
-                    count++;
-
-                    if (count % 1000 == 0) {
-                        System.out.println(count);
-                    }
-                }
-            } else {
-                // OOM
-                var newPath = Sets.newLinkedHashSet(path);
-                newPath.add(to);
-                count += countPaths(cameFrom, to, target, newPath);
-            }
-        }
-        return count;
-    }
-
-    private int simpleCountPaths(HashMultimap<String, String> cameFrom, String from, String target) {
-        var count = 0;
         for (String to : cameFrom.get(from)) {
             if (to.equals(target)) {
                 count++;
             } else {
-                count += simpleCountPaths(cameFrom, to, target);
+                count += countPaths(cameFrom, to, target);
             }
         }
         return count;
@@ -171,6 +148,4 @@ public class Day11Solution {
         }
         return graph;
     }
-
-
 }
